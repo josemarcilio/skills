@@ -1,8 +1,10 @@
 # Agent Skills
 
-[![skills.sh](https://skills.sh/b/josemarcilio/skills)](https://skills.sh/josemarcilio/skills)
+[![Install with skills.sh](https://img.shields.io/badge/skills.sh-install-111111)](https://github.com/josemarcilio/skills)
 
 Reusable agent skills installable via [skills.sh](https://www.skills.sh/) and the Vercel skills CLI.
+
+> The live install-count badge (`https://skills.sh/b/josemarcilio/skills`) appears after skills.sh indexes this repo from `npx skills add` telemetry. Until then, use the static badge above so the README does not show a broken image.
 
 ## Install
 
