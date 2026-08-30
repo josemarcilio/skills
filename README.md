@@ -21,13 +21,16 @@ npx skills add josemarcilio/skills --skill okf
 | Skill | Path | Description |
 | --- | --- | --- |
 | **okf** | [`skills/misc/okf/`](skills/misc/okf/) | Produce and bootstrap project knowledge docs using Open Knowledge Format (OKF) in `.okf/` |
+| **feed-second-brain** | [`skills/misc/feed-second-brain/`](skills/misc/feed-second-brain/) | Capture notes into `SECOND_BRAIN_PATH` using that vault's `AGENTS.md` / `CLAUDE.md` |
 
 ## Repository layout
 
 ```
 skills/
 └── misc/
-    └── okf/
+    ├── okf/
+    │   └── SKILL.md
+    └── feed-second-brain/
         └── SKILL.md
 ```
 

@@ -1,0 +1,1 @@
+When wrapping up durable work, read ~/.cursor/feed-second-brain/reminder.md and softly suggest /feed-second-brain if worth capturing. Never write to the vault unless the user invokes that skill.
