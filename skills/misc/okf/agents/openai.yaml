@@ -1,0 +1,3 @@
+interface:
+  display_name: "OKF"
+  short_description: "Document project knowledge in .okf/"
