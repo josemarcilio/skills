@@ -36,9 +36,14 @@ created (step 3 always reports its id) before creating one.
    branch pattern, target branch, PR title pattern, merge strategy, test and lint commands per
    [conventions.md](../references/conventions.md).
 
-3. **Parent item** (skip if given). Write the description and acceptance criteria in the format
-   the adapter requires (Azure Boards: HTML). cli-runner: `create_parent_item`. Tell the user the
-   new id right away — until step 4 it exists only in this chat.
+3. **Parent item.**
+   - **Already exists** (the user gave an id): don't create or edit it. cli-runner: `get_item` for
+     its title, url and children. If it already has children, show them and ask whether to reuse
+     them as tasks; reused ones go into the Tasks table with their ids, and the planner gets their
+     titles in step 5 so it doesn't plan them again.
+   - **Doesn't exist**: write the description and acceptance criteria in the format the adapter
+     requires (Azure Boards: HTML). cli-runner: `create_parent_item`. Tell the user the new id right
+     away — until step 4 it exists only in this chat.
 
 4. **Worktree, branch, stub plan.** Per [conventions.md](../references/conventions.md) →
    Worktree: create it, **verify the branch name** (fix a wrong one before anything else), add the
