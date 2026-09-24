@@ -14,6 +14,9 @@ npx skills add josemarcilio/skills --list
 
 # Install the OKF documentation skill
 npx skills add josemarcilio/skills --skill okf
+
+# Install the end-to-end development workflow skill
+npx skills add josemarcilio/skills --skill dev-workflow
 ```
 
 ## Skills
@@ -22,11 +25,15 @@ npx skills add josemarcilio/skills --skill okf
 | --- | --- | --- |
 | **okf** | [`skills/misc/okf/`](skills/misc/okf/) | Produce and bootstrap project knowledge docs using Open Knowledge Format (OKF) in `.okf/` |
 | **feed-second-brain** | [`skills/misc/feed-second-brain/`](skills/misc/feed-second-brain/) | Capture notes into `SECOND_BRAIN_PATH` using that vault's `AGENTS.md` / `CLAUDE.md` |
+| **dev-workflow** | [`skills/engineering/dev-workflow/`](skills/engineering/dev-workflow/) | Run work end to end and resumably: work item + INVEST tasks, worktree + draft PR, TDD with paired reviewers, PR audit, PR comment threads, completion. Tracker-agnostic adapters (Azure DevOps included) |
 
 ## Repository layout
 
 ```
 skills/
+├── engineering/
+│   └── dev-workflow/
+│       └── SKILL.md
 └── misc/
     ├── okf/
     │   └── SKILL.md
