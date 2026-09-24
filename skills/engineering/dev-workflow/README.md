@@ -370,8 +370,6 @@ The skill reads your repo's rules and lets them win:
 
 ## Known limitations
 
-- **Not yet validated live.** The adapter commands (especially Azure's REST calls and GitHub's
-  GraphQL queries) need a first real run.
 - **GitHub Projects** status and iteration fields are not handled; milestones stand in for
   iterations.
 - **Older GitHub Enterprise servers** without sub-issues report tasks as not linked.
