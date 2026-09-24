@@ -47,10 +47,34 @@ is the assignee's name or login, which the tracker needs and `plan.md` records.
 ## Payload files
 
 Descriptions, replies and JSON bodies for the cli-runner go to the OS temp directory or the
-harness's scratch directory (the `temp_dir` of the dispatch) — never into the repo. One exception:
-`handoffs/pr-description.md` is the PR description's source of truth, so every update is a small
-edit to it instead of a rewrite. Edits someone makes in the web UI are overwritten on the next
-update — tell the user when you notice the description changed there.
+harness's scratch directory (the `temp_dir` of the dispatch) — never into the repo. The one
+repo file is `handoffs/pr-description.md`, the record described below.
+
+## PR description
+
+The skill owns only the **managed block** between `<!-- dev-workflow:start -->` and
+`<!-- dev-workflow:end -->` (see [templates/pr-description.md](../templates/pr-description.md)).
+Everything outside it — the summary, a footer, anything people or bots add — is never changed
+after the PR is created. `handoffs/pr-description.md` holds the block exactly as last pushed.
+
+**Create:** fill the whole template into a payload file for `create_draft_pr`; save the part
+between the markers to `handoffs/pr-description.md`.
+
+**Update** (ticking a task, the audit result, the follow-up link, the final cleanup):
+
+1. Write the new block (without markers) to a file in `temp_dir`.
+2. cli-runner (tier `standard`): `get_pr_description` into another `temp_dir` file.
+3. Find both markers in the current description. Either missing → stop and show the user; offer
+   to append the block at the end.
+4. Compare the current block with `handoffs/pr-description.md`, ignoring line-ending and trailing
+   whitespace differences. Different → someone edited inside the block: show the difference and
+   ask whether to fold their edit into the new block or overwrite it.
+5. Build the full description: everything before the start marker, the start marker, the new
+   block, the end marker, everything after it. Write it to `temp_dir`; cli-runner:
+   `update_pr_description` with that file.
+6. Only after that succeeds, save the new block to `handoffs/pr-description.md`. This is the one
+   record written after its side effect: saving it first would make the next comparison report a
+   false edit whenever the push failed.
 
 ## Handoffs
 

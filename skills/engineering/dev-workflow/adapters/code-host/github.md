@@ -29,6 +29,15 @@ gh pr create -R {owner}/{repo} --draft --base "{target_branch}" --head "{source_
 ```
 Prints the PR URL, not JSON. `pr_id` = its last path segment; `url` = the printed URL.
 
+## get_pr_description
+
+Tier: standard (copies text verbatim).
+```
+gh pr view {pr_id} -R {owner}/{repo} --json body --jq .body
+```
+Write the command's output to `{out_file}` exactly as printed, with a file-writing tool. `chars` =
+its length. Nothing printed → empty file.
+
 ## update_pr_description
 
 ```

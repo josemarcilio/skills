@@ -26,6 +26,15 @@ Returns `pr_id` (`pullRequestId`) and the web `url`. `{item_ids}` is space-separ
 `--work-items` only links Azure Boards items. With another work-items adapter, omit the flag; the
 description file carries the item keys instead.
 
+## get_pr_description
+
+Tier: standard (copies text verbatim).
+```
+az repos pr show --id {pr_id} --query description --output tsv
+```
+Write the command's output to `{out_file}` exactly as printed, with a file-writing tool. `chars` =
+its length. Nothing printed → empty file.
+
 ## update_pr_description
 
 ```

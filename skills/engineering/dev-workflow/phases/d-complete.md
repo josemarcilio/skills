@@ -27,8 +27,9 @@ again (step 3 — the earlier answers lived only in chat), then continue at step
    target branch's history even though the final tree drops them. Completing a PR is hard to
    reverse — wait for an explicit yes.
 
-4. **Final PR description.** Edit `handoffs/pr-description.md`: remove the "Working notes"
-   section, keep the Audit result line. cli-runner: `update_pr_description`.
+4. **Final PR description.** Update the managed block without the "Working notes" section,
+   keeping the Items, Tasks, Audit and Follow-up lines
+   ([conventions.md](../references/conventions.md) → PR description → Update).
 
 5. **Cleanup commit.** In the worktree, delete `.agents/dev-workflows/<item-id>/plan.md` and
    `.agents/dev-workflows/<item-id>/handoffs/`. `git status` must show only those deletions.

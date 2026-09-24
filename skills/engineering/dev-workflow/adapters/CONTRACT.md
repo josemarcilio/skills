@@ -53,6 +53,7 @@ real state names using `state_map` — the `states_parent` or `states_task` stri
 | Operation | Inputs | Returns |
 |---|---|---|
 | `create_draft_pr` | `source_branch`, `target_branch`, `title`, `description_file`, `item_ids` | `pr_id`, `url` |
+| `get_pr_description` | `pr_id`, `out_file` | `pr_id`, `out_file`, `chars` |
 | `update_pr_description` | `pr_id`, `description_file` | `pr_id` |
 | `set_pr_ready` | `pr_id` | `pr_id`, `draft` (no) |
 | `get_pr_status` | `pr_id` | `pr_id`, `draft` (yes/no), `state` (`open` / `completed` / `abandoned`), `approved` (yes/no), `changes_requested` (yes/no), `approvers` (names) |
@@ -72,6 +73,10 @@ references in the description text (GitHub). Each code-host adapter states which
 orchestrator writes any required references into the description file.
 
 Unsupported `merge_strategy` → `STATUS: ERROR`; never substitute another strategy.
+
+`get_pr_description` writes the current description to `out_file` **verbatim** — no trimming,
+reformatting, or summarizing; empty description → empty file. The orchestrator merges its managed
+block into it (see `references/conventions.md` → PR description).
 
 `get_pr_status` `approved` means the platform's own reviewers approved: every required reviewer
 approved and nobody rejected or requested changes. It says nothing about checks or builds.
