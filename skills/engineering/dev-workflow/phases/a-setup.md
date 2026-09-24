@@ -61,9 +61,10 @@ created (step 3 always reports its id) before creating one.
 
 8. **Draft PR.** Fill [templates/pr-description.md](../templates/pr-description.md) into
    `handoffs/pr-description.md` (the PR description's source of truth from now on). cli-runner:
-   `create_draft_pr` with that file and the item id(s); title per the recorded pattern. If the
-   code-host adapter links items through the description (GitHub), write the references it asks
-   for into the Items line first. Record the
+   `create_draft_pr` with that file and the **parent item id only** — child tasks are reached
+   through the parent, so they are never linked to the PR. Title per the recorded pattern. If the
+   code-host adapter links items through the description (GitHub), write the parent reference it
+   asks for into the Items line first. Record the
    PR in `plan.md`, set `Setup: complete`, commit, push.
 
 9. **Tell the user**: item and PR links, task list, worktree path. Next: Phase B.
