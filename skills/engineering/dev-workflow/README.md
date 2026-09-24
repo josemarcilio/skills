@@ -82,7 +82,7 @@ flowchart LR
     end
     A --> B
     subgraph B [Phase B · Execute]
-        B1[Per task: TDD loop<br/>+ reviewer agents] --> B2[Commit per task] --> B3[PR audit]
+        B1[Per task: TDD loop<br/>+ reviewer agents<br/>see below] --> B2[Commit per task] --> B3[PR audit]
     end
     B --> C
     subgraph C [Phase C · Feedback]
@@ -95,6 +95,51 @@ flowchart LR
         D0[Final learnings harvest] --> D1[Remove working notes] --> D2[Merge PR]
     end
 ```
+
+### Inside one task
+
+Each seam runs one red → green cycle, and every step is a review checkpoint. The reviewers are the
+same two agents for the whole session, so each round remembers what earlier rounds flagged.
+
+```mermaid
+flowchart TD
+    S["Task start<br/>confirm seams with you"] --> R
+
+    subgraph CYCLE ["One cycle per seam"]
+        R["RED<br/>write one failing test,<br/>run it"] --> RT{"reviewer-tests<br/>phase: red"}
+        RT -- "NEEDS_CHANGES" --> R
+        RT -- "PASS" --> G["GREEN<br/>minimal code to pass,<br/>run tests"]
+        G --> GR{"reviewer-code + reviewer-tests<br/>phase: green<br/>run concurrently"}
+        GR -- "NEEDS_CHANGES" --> F["Fix or refactor,<br/>re-run tests"]
+        F -- "test files → tests lane<br/>code files → code lane" --> GR
+    end
+
+    GR -- "PASS" --> N{"More seams?"}
+    N -- "yes" --> R
+    N -- "no" --> TR{"reviewer-tests<br/>phase: task<br/>whole suite vs criteria"}
+    TR -- "NEEDS_CHANGES<br/>criterion without a test" --> R
+    TR -- "PASS" --> V["Verification gate<br/>project tests + lint"]
+    V -- "fails" --> F
+    V -- "passes" --> C["Handoff → commit → push<br/>task done"]
+
+    RT -- "FAIL" --> U(["Stop: your decision"])
+    GR -- "FAIL" --> U
+    TR -- "FAIL" --> U
+```
+
+What each checkpoint looks for:
+
+| Checkpoint | Reviewer | Checks |
+|---|---|---|
+| After RED | tests | right seam, behavior not internals, fails for the intended reason |
+| After GREEN | code + tests, together | project code rules and refactor needs; branches the new code added without a test; tests bent to fit the code |
+| After a fix | lane of the files changed | the change itself, and repeats of earlier findings |
+| Task close | tests | every acceptance criterion has a test at a confirmed seam; no duplicates across cycles |
+| Verification gate | — (runs your commands) | the suite and linter actually pass — a `PASS` verdict only means "nothing found by reading" |
+
+`NEEDS_CHANGES` loops back automatically. `FAIL` — a critical-rule break or a design question —
+stops for you. The same blocking issue surviving three rounds also stops for you, instead of a
+fourth attempt.
 
 The main agent acts as an **orchestrator**. It delegates planning, tracker commands, reviews, and
 the audit to specialized agents, and writes code itself only inside the TDD loop and for PR-comment
