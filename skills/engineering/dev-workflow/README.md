@@ -98,34 +98,21 @@ flowchart LR
 
 ### Inside one task
 
-Each seam runs one red → green cycle, and every step is a review checkpoint. The reviewers are the
-same two agents for the whole session, so each round remembers what earlier rounds flagged.
+Each seam runs one red → green cycle, with a review after each step.
 
 ```mermaid
-flowchart TD
-    S["Task start<br/>confirm seams with you"] --> R
-
-    subgraph CYCLE ["One cycle per seam"]
-        R["RED<br/>write one failing test,<br/>run it"] --> RT{"reviewer-tests<br/>phase: red"}
-        RT -- "NEEDS_CHANGES" --> R
-        RT -- "PASS" --> G["GREEN<br/>minimal code to pass,<br/>run tests"]
-        G --> GR{"reviewer-code + reviewer-tests<br/>phase: green<br/>run concurrently"}
-        GR -- "NEEDS_CHANGES" --> F["Fix or refactor,<br/>re-run tests"]
-        F -- "test files → tests lane<br/>code files → code lane" --> GR
-    end
-
-    GR -- "PASS" --> N{"More seams?"}
-    N -- "yes" --> R
-    N -- "no" --> TR{"reviewer-tests<br/>phase: task<br/>whole suite vs criteria"}
-    TR -- "NEEDS_CHANGES<br/>criterion without a test" --> R
-    TR -- "PASS" --> V["Verification gate<br/>project tests + lint"]
-    V -- "fails" --> F
-    V -- "passes" --> C["Handoff → commit → push<br/>task done"]
-
-    RT -- "FAIL" --> U(["Stop: your decision"])
-    GR -- "FAIL" --> U
-    TR -- "FAIL" --> U
+flowchart LR
+    R["RED<br/>failing test"] --> RT["Review<br/>test"]
+    RT --> G["GREEN<br/>minimal code"]
+    G --> GR["Review<br/>code + test"]
+    GR -- next seam --> R
+    GR -- done --> T["Review<br/>whole suite"]
+    T --> V["Run tests<br/>+ lint"]
+    V --> C["Commit"]
 ```
+
+Any review can send the work back for fixes, or stop and ask you. The reviewers are the same two
+agents for the whole session, so each round remembers what earlier rounds flagged.
 
 What each checkpoint looks for:
 
