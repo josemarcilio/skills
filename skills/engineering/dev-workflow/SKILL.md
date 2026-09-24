@@ -1,6 +1,6 @@
 ---
 name: dev-workflow
-description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR, builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps and GitHub included). Use when the user says "start this work", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
+description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR, builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, turns reviewers' general rules into a follow-up PR against the project's rule docs, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps and GitHub included). Use when the user says "start this work", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
 ---
 
 # Dev workflow
@@ -17,6 +17,7 @@ audit to agents. You write code yourself only inside the TDD loop and for PR-com
 | reviewer-code | [agents/reviewer-code.md](agents/reviewer-code.md) | standard | persistent per session |
 | reviewer-tests | [agents/reviewer-tests.md](agents/reviewer-tests.md) | standard | persistent per session |
 | pr-auditor | [agents/pr-auditor.md](agents/pr-auditor.md) | capable | fresh per audit |
+| learnings-curator | [agents/learnings-curator.md](agents/learnings-curator.md) | capable | fresh per harvest |
 
 **Tier → model** (edit this table for other harnesses):
 
@@ -46,6 +47,7 @@ worktree/.agents/dev-workflows/<item-id>/                          committed on 
     ├── pr-description.md    source of truth for the PR description
     ├── <task-id>.md         one per task
     ├── pr-audit.md          audit result and ready flag
+    ├── learnings.md         review-learnings harvest record
     └── pr/<thread-id>.md    one per PR comment thread
 ```
 
@@ -61,7 +63,8 @@ Nothing depends on chat memory: every run starts by reading these files in the w
 5. All tasks `Done`, `pr-audit.md` missing or not `Ready: yes` → **Phase B → PR audit**.
 6. `Ready: yes` → **Phase C**. User asks to complete → **Phase D**.
 
-The user's explicit request ("check the comments", "redo the audit") overrides the route. Say
+The user's explicit request ("check the comments", "redo the audit", "harvest the learnings")
+overrides the route. Say
 which phase you're entering and why, in one line.
 
 | Phase | File | Ends with |
@@ -70,6 +73,7 @@ which phase you're entering and why, in one line.
 | B Execute | [phases/b-execute.md](phases/b-execute.md) | tasks done via TDD + reviews, audit passed, PR ready |
 | C Feedback | [phases/c-feedback.md](phases/c-feedback.md) | every human thread answered |
 | D Complete | [phases/d-complete.md](phases/d-complete.md) | notes removed, PR completed |
+| Learnings | [phases/e-learnings.md](phases/e-learnings.md) | rule edits in a follow-up PR (on approval, before completing) |
 
 ## Always
 

@@ -8,8 +8,8 @@ the user asks to complete.
 
 ## Steps
 
-1. **Fetch.** cli-runner (tier `standard`): `list_threads` with `pr_id` and context from
-   `plan.md`.
+1. **Fetch.** cli-runner (tier `standard`): `list_threads` and `get_pr_status` with `pr_id` and
+   context from `plan.md`.
 
 2. **Pick what to work.** For each returned thread, open `handoffs/pr/<thread-id>.md`:
    - no file → new, work it;
@@ -32,6 +32,10 @@ the user asks to complete.
    ([templates/thread-handoff.md](../templates/thread-handoff.md)): asked, found, decision, the
    reply text you will post. Update "Last seen comment" to the thread's current `last_comment_id`.
    For **ask the user**, set Status `Needs user` and stop on this thread here.
+   If the comment states a general rule (it would apply beyond this line — "we always...", "tests
+   here must not..."), add a `Learning:` line with its lane (`code` or `tests`) and the rule in one
+   line. Send it now to the running reviewer for that lane, as a rule relayed from human review,
+   so later rounds apply it.
 
 6. **Fix (if fixing).** Same bar as Phase B: TDD loop when behavior changes
    ([references/tdd.md](../references/tdd.md)), review rounds with the same reviewers (reused if
@@ -47,6 +51,9 @@ the user asks to complete.
 
 8. **Next thread.** Repeat from step 3. At the end, push any pending handoff commits and tell the
    user: threads answered, fixed, resolved, still waiting, needing their input.
+
+9. **Approval trigger.** If step 1 returned `approved: yes` and `handoffs/learnings.md` has no
+   harvest covering this approval, run the [learnings harvest](e-learnings.md), then stop.
 
 ## Rules
 

@@ -55,6 +55,7 @@ real state names using `state_map` — the `states_parent` or `states_task` stri
 | `create_draft_pr` | `source_branch`, `target_branch`, `title`, `description_file`, `item_ids` | `pr_id`, `url` |
 | `update_pr_description` | `pr_id`, `description_file` | `pr_id` |
 | `set_pr_ready` | `pr_id` | `pr_id`, `draft` (no) |
+| `get_pr_status` | `pr_id` | `pr_id`, `draft` (yes/no), `state` (`open` / `completed` / `abandoned`), `approved` (yes/no), `changes_requested` (yes/no), `approvers` (names) |
 | `list_threads` | `pr_id` | one block per human thread: `thread_id`, `status`, `file`, `line`, `last_comment_id`, `last_author`, `last_date`, `excerpt` |
 | `reply_thread` | `pr_id`, `thread_id`, `body_file` | `thread_id`, `comment_id` |
 | `resolve_thread` | `pr_id`, `thread_id` | `thread_id`, `status` |
@@ -71,6 +72,9 @@ references in the description text (GitHub). Each code-host adapter states which
 orchestrator writes any required references into the description file.
 
 Unsupported `merge_strategy` → `STATUS: ERROR`; never substitute another strategy.
+
+`get_pr_status` `approved` means the platform's own reviewers approved: every required reviewer
+approved and nobody rejected or requested changes. It says nothing about checks or builds.
 
 Text payloads (descriptions, replies) are always passed as files the main agent writes to a
 scratch/temp location — never inline in a command — so quoting and newlines survive every shell.
