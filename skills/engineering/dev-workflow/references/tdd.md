@@ -21,12 +21,25 @@ exported function, an endpoint, a component's inputs and outputs, a CLI command.
    [phases/b-execute.md](../phases/b-execute.md)).
 3. **GREEN** — write only enough code to pass. Don't anticipate the next test, don't add
    speculative features. Run the relevant tests; all must pass.
-4. **Review the code** — send `reviewer-code` the production files changed in this cycle.
-   Refactoring suggestions come from this review — refactoring is not part of the loop. Apply
-   them, re-run tests, re-review.
+4. **Review both** — in one message, so they run concurrently:
+   - `reviewer-code`: the production files changed in this cycle. Refactoring suggestions come
+     from this review — refactoring is not part of the loop.
+   - `reviewer-tests`, `phase: green`: the cycle's test file(s) **and** the production files. It
+     checks the test against the real code — branches the green code added without a test, and
+     any test edits made while getting to green.
+   Merge the verdicts and act on them. A fix or refactor that touches a test file goes back to
+   `reviewer-tests` (`phase: tests`); one that touches production code goes back to
+   `reviewer-code`. Re-run the tests after every change.
 
 Repeat for the next behavior. Each test is a tracer bullet: let what the last cycle taught you
 shape the next test. Never write all tests first and all code after (horizontal slicing).
+
+## Task close — one review of the whole suite
+
+After the last seam, before the verification gate: send `reviewer-tests` `phase: task` with every
+test file the task touched, the production files, and all its acceptance criteria. It checks that
+each criterion has a test at a confirmed seam, and finds duplicates across cycles — things no
+single cycle can see.
 
 ## What a good test is
 

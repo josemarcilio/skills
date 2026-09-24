@@ -46,12 +46,17 @@ the session, come back tomorrow, say "continue the work", and it picks up where 
 - **Sets up the tracker and the branch.** It creates the parent item (PBI, story, or issue) and one
   child task per ticket, creates a worktree and a branch that follows your repo's naming rules, and
   opens a draft PR linked to the parent item.
-- **Builds with TDD.** Each task runs a strict loop per behavior: write one failing test, have it
-  reviewed, write the minimal code to pass, have the code reviewed. Refactoring suggestions come
-  from the review, not from the loop.
+- **Builds with TDD.** Each task runs a strict loop per behavior: write one failing test and have
+  it reviewed, write the minimal code to pass, then have **both** the code and the test reviewed
+  against that real code. Refactoring suggestions come from the review, not from the loop.
+- **Reviews tests three times, not once.** The test reviewer checks each test when it's written
+  (right seam, fails for the right reason), again once the code exists (branches the code added
+  without a test, tests bent to fit the code), and once more for the whole task (every acceptance
+  criterion has a test, no duplicates across cycles).
 - **Reviews every round.** Two reviewer agents — one for production code, one for tests — check
-  each change against your project's own rules (`AGENTS.md`, `CLAUDE.md`, and the docs they point
-  to). They stay alive for the whole session, so they remember what they already flagged.
+  changes against your project's own rules (`AGENTS.md`, `CLAUDE.md`, and the docs they point to).
+  Any change to a test goes to the test reviewer; any change to code goes to the code reviewer.
+  They stay alive for the whole session, so they remember what they already flagged.
 - **Audits the PR before it leaves draft.** A capable auditor agent builds a claim ledger (every
   acceptance criterion and PR claim vs. real evidence), runs a static hostile-change gate
   (supply chain, CI, credentials, obfuscation), runs your checks, and reviews security,
@@ -181,7 +186,8 @@ For each task, in order:
 
 1. Marks it active and opens its handoff.
 2. Confirms the test seams with you.
-3. Runs the TDD loop per behavior: **red → test review → green → code review**.
+3. Runs the TDD loop per behavior: **red → test review → green → code + test review**
+   (concurrently), then one review of the task's whole test suite against its acceptance criteria.
 4. Runs your tests and linter. A reviewer's `PASS` means "nothing found by reading", not "it works".
 5. Writes the handoff, commits (one commit series per task), pushes, and marks the task done.
 

@@ -17,9 +17,10 @@ draft → Phase C.
    handoff. If the code area is unfamiliar, do a read-only exploration first and mirror the
    conventions you find — don't invent a new shape.
 
-3. **Build with TDD.** Follow [references/tdd.md](../references/tdd.md): per seam, RED → test
-   review → GREEN → code review. Tasks with no runtime behavior skip the loop and get one
-   code review. Update the handoff after every review round.
+3. **Build with TDD.** Follow [references/tdd.md](../references/tdd.md): per seam, RED → tests
+   review → GREEN → code **and** tests review together; then one task-level tests review of the
+   whole suite against the acceptance criteria. Tasks with no runtime behavior skip the loop and
+   get one code review. Update the handoff after every review round.
 
 4. **Verification gate.** Run the project's test and lint commands for the affected area. A
    reviewer `PASS` means "no issues found by reading", not "it works". Failing checks: fix, re-run;
@@ -51,14 +52,18 @@ text of [agents/reviewer-code.md](../agents/reviewer-code.md) (or
 - Every later round: `SendMessage` to that same id. Never spawn a second instance of a lane that
   is running — it loses the memory of earlier rounds.
 - `reviewer-tests` joins on the first round that touches tests; `reviewer-code` on the first
-  round with production code. When both apply in one round, send both in the same message so they
-  run concurrently.
+  round with production code. When both apply in one round (every GREEN round does), send both in
+  the same message so they run concurrently.
+- A change to a test file always goes to `reviewer-tests`, a change to production code always goes
+  to `reviewer-code` — never only one when both changed.
 - A new session (next day, cleared context) starts fresh reviewers. Note it in the handoff.
 - Past ~25–30 rounds in one session, offer the user a reviewer restart (cheaper rounds, lost
   repeat-violation memory). Never restart silently.
 
 **Each round** send only the files changed in that round (not a full diff), plus for tests the
-`phase`, seam, acceptance criteria, and failure output.
+`phase` (`red`, `green`, `task`, `tests`), seam, acceptance criteria, and — for `red` — the failure
+output. `green` rounds include the production files too; `task` rounds include every test and
+production file the task touched.
 
 **Merge and act.** When both lanes ran: verdict = the worst (`FAIL` > `NEEDS_CHANGES` > `PASS`),
 issues concatenated.
