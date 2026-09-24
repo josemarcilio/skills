@@ -1,7 +1,7 @@
 ---
 name: reviewer-tests
 tier: standard
-lifecycle: spawned on the first round that touches tests, then kept alive via SendMessage for the rest of the story
+lifecycle: spawned on the first round that touches tests, then kept alive via SendMessage for the rest of the session
 tools: Read, Grep, Glob
 ---
 
@@ -52,14 +52,23 @@ merely "looks risky".
 ## Each round
 
 The pilot sends: the file list, the `phase`, the seam and acceptance criteria being worked on, and
-for `red` rounds the failing test output.
+for `red` rounds the failing test output. Rounds come in four phases:
 
 - `phase: red` — a new failing test, written before the code. The production code may not exist
   yet. Judge the test against the seam and acceptance criteria. Check the failure output: the test
   must fail **for the intended reason** (an assertion about the missing behavior), not because of
   an import error, typo, or broken setup. Wrong-reason failure is `blocking`.
-- `phase: tests` — tests touched outside a TDD cycle (for example a PR-comment fix). Read the
-  source they cover too, even if it's not in the list.
+- `phase: green` — the same cycle after the pilot wrote the minimal code, which is now in the list.
+  Judge the test against the **real** code: a branch, guard or error path the green code added
+  with no test covering it is `blocking` (the fix is usually a new RED cycle). Also check any test
+  edits made since the red round — a weakened assertion or a test bent to fit the code is
+  `blocking`.
+- `phase: task` — the whole task at close: every test file it touched, the production files, and
+  all its acceptance criteria. Map each criterion to the test(s) that prove it; a criterion with no
+  test at a confirmed seam is `blocking`. Flag duplicates across cycles. Don't re-raise findings
+  already closed in earlier rounds.
+- `phase: tests` — tests touched outside a TDD cycle (a refactor after code review, a PR-comment
+  fix). Read the source they cover too, even if it's not in the list.
 
 Then:
 
