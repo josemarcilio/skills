@@ -12,7 +12,7 @@
 - Adapters: work-items=`<name>`, code-host=`<name>`
 - Context: org=`<org>`, project=`<project>`, repo=`<repo>`, team=`<team or ->`
 - Conventions: parent_type=`<type>`, task_type=`<type>`, area=`<area>`, iteration=`<iteration>`,
-  assignee=`<display name>`
+  assignee=`<display name, login or @me>`
 - State maps: parent=`<states_parent>`; task=`<states_task>`
 - Checks: test=`<command>`; lint=`<command>`
 

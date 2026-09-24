@@ -23,6 +23,8 @@ Never block waiting on either; after one hang, switch routes.
 az repos pr create --draft true --source-branch "{source_branch}" --target-branch "{target_branch}" --title "{title}" --description "@{description_file}" --work-items {item_ids} --output json
 ```
 Returns `pr_id` (`pullRequestId`) and the web `url`. `{item_ids}` is space-separated.
+`--work-items` only links Azure Boards items. With another work-items adapter, omit the flag; the
+description file carries the item keys instead.
 
 ## update_pr_description
 

@@ -1,6 +1,6 @@
 ---
 name: dev-workflow
-description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR, builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps included). Use when the user says "start this work", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
+description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR, builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps and GitHub included). Use when the user says "start this work", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
 ---
 
 # Dev workflow
