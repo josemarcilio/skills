@@ -42,7 +42,7 @@ Applies to `plan.md`, handoffs, PR descriptions, replies, commit messages.
 
 Never write tokens, keys, passwords, connection strings or personal data into any file this skill
 creates, or into any payload. Refer to them by name ("the `API_KEY` env var"). The one exception
-is the assignee's display name, which the tracker needs and `plan.md` records.
+is the assignee's name or login, which the tracker needs and `plan.md` records.
 
 ## Payload files
 

@@ -1,5 +1,7 @@
 <Title-level summary: one or two sentences on what this delivers.>
 
+Items: <item links the code host needs — for example `Refs #12` on GitHub; blank when linked by flag>
+
 ## Tasks
 
 - [ ] [<task-id>](<url>) <title>

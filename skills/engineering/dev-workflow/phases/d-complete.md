@@ -18,8 +18,8 @@ again (step 2 — the earlier answers lived only in chat), then continue at step
    "Last seen", or with status `Needs user`, or with no handoff → tell the user and ask whether to
    continue anyway.
 
-2. **Confirm.** Show: PR, target branch, merge strategy from `plan.md`, delete source branch
-   yes/no. With `merge` (not `squash`), warn that the commits which added the notes stay in the
+2. **Confirm.** Show: PR, target branch, merge strategy from `plan.md` (`squash`, `merge`, or
+   `rebase` where the code-host adapter supports it), delete source branch yes/no. With `merge` (not `squash`), warn that the commits which added the notes stay in the
    target branch's history even though the final tree drops them. Completing a PR is hard to
    reverse — wait for an explicit yes.
 

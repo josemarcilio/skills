@@ -10,7 +10,8 @@ From "start this work" to a linked item, child tasks, a worktree, `plan.md`, and
   description. This skill does not create the plan. If there is none, say so and suggest the
   project's planning skill (for example a grilling or spec skill), then stop.
 - **Item**: an existing work item id, or "create one".
-- **Assignee**: the display name to assign items to (usually the user).
+- **Assignee**: who to assign items to (usually the user), in the tracker's format — a display
+  name for Azure Boards, a login or `@me` for GitHub.
 - **Team / owner**: only if the tracker or branch pattern needs it.
 
 ## Resuming
@@ -60,7 +61,9 @@ created (step 3 always reports its id) before creating one.
 
 8. **Draft PR.** Fill [templates/pr-description.md](../templates/pr-description.md) into
    `handoffs/pr-description.md` (the PR description's source of truth from now on). cli-runner:
-   `create_draft_pr` with that file and the item id(s); title per the recorded pattern. Record the
+   `create_draft_pr` with that file and the item id(s); title per the recorded pattern. If the
+   code-host adapter links items through the description (GitHub), write the references it asks
+   for into the Items line first. Record the
    PR in `plan.md`, set `Setup: complete`, commit, push.
 
 9. **Tell the user**: item and PR links, task list, worktree path. Next: Phase B.

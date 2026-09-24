@@ -58,10 +58,19 @@ real state names using `state_map` — the `states_parent` or `states_task` stri
 | `list_threads` | `pr_id` | one block per human thread: `thread_id`, `status`, `file`, `line`, `last_comment_id`, `last_author`, `last_date`, `excerpt` |
 | `reply_thread` | `pr_id`, `thread_id`, `body_file` | `thread_id`, `comment_id` |
 | `resolve_thread` | `pr_id`, `thread_id` | `thread_id`, `status` |
-| `complete_pr` | `pr_id`, `merge_strategy`, `delete_source_branch` | `pr_id`, `status`, `merge_commit` |
+| `complete_pr` | `pr_id`, `source_branch`, `merge_strategy` (`squash` / `merge` / `rebase`), `delete_source_branch` | `pr_id`, `status`, `merge_commit` |
 
 `list_threads` must drop system/bot threads (status changes, votes, pushes) and return only
 threads a person wrote.
+
+`resolve_thread` returns `status: unsupported` (with `STATUS: OK`) for threads the platform
+can't resolve — for example GitHub's general PR comments. Record it as not resolved.
+
+`create_draft_pr` links `item_ids` however the platform does it: a flag (Azure Repos) or
+references in the description text (GitHub). Each code-host adapter states which; the
+orchestrator writes any required references into the description file.
+
+Unsupported `merge_strategy` → `STATUS: ERROR`; never substitute another strategy.
 
 Text payloads (descriptions, replies) are always passed as files the main agent writes to a
 scratch/temp location — never inline in a command — so quoting and newlines survive every shell.
