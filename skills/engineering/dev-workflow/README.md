@@ -102,8 +102,7 @@ You can always override the route ("check the PR comments", "redo the audit").
 ## Requirements
 
 - **An agent harness with subagents.** The skill spawns agents and needs a way to continue a
-  running agent (for persistent reviewers). Designed for
-  [Claude Code](https://claude.com/claude-code) (`Agent` + `SendMessage`).
+  running agent (for persistent reviewers).
 - **git** with worktree support.
 - **A tracker CLI**, authenticated:
   - Azure DevOps: [Azure CLI](https://learn.microsoft.com/cli/azure/) with the `azure-devops`
@@ -118,8 +117,7 @@ You can always override the route ("check the PR comments", "redo the audit").
 npx skills add josemarcilio/skills --skill dev-workflow
 ```
 
-Or copy (or link) `skills/engineering/dev-workflow/` into your harness's skills folder — for Claude
-Code, `~/.claude/skills/dev-workflow/`.
+Or copy (or link) `skills/engineering/dev-workflow/` into your harness's skills folder.
 
 ## Usage
 
@@ -210,8 +208,7 @@ never bypasses branch policies.
 | **pr-auditor** | Claim ledger, hostile-change gate, full audit | capable | fresh per audit |
 
 Personas are declared by **tier**, not by model name. `SKILL.md` holds one small table that maps
-tiers to models per harness (in Claude Code: `haiku` / inherit / `opus`). To move to another
-harness, edit that one table.
+tiers to models per harness. To move to another harness, edit that one table.
 
 The agents are spawned as general-purpose agents with the persona file passed as their
 instructions. The skill does not depend on agent types being registered in your repo.
