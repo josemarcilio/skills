@@ -44,7 +44,7 @@ main checkout/.agents/dev-workflows/<item-id>/worktrees/<slug>/   the worktree (
 worktree/.agents/dev-workflows/<item-id>/                          committed on the branch
 ├── plan.md                  context, conventions, tickets; frozen after setup
 └── handoffs/
-    ├── pr-description.md    source of truth for the PR description
+    ├── pr-description.md    the PR description's managed block, as last pushed
     ├── <task-id>.md         one per task
     ├── pr-audit.md          audit result and ready flag
     ├── learnings.md         review-learnings harvest record

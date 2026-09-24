@@ -1,5 +1,7 @@
-<Title-level summary: one or two sentences on what this delivers.>
+<Title-level summary: one or two sentences on what this delivers. Outside the managed block —
+written once at creation, then owned by people.>
 
+<!-- dev-workflow:start -->
 Items: <parent item link the code host needs — for example `Refs #12` on GitHub; blank when linked by flag>
 
 ## Tasks
@@ -19,5 +21,6 @@ Follow-up: <review-learnings PR link> | —
 - Worktree: `<user-home>/.../.agents/dev-workflows/<item-id>/worktrees/<slug>`
 
 These notes are removed by a cleanup commit before merge.
+<!-- dev-workflow:end -->
 
-<Project-required PR footer or attribution, if any.>
+<Project-required PR footer or attribution, if any. Outside the block, like the summary.>

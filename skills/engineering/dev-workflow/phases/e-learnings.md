@@ -45,9 +45,11 @@ its approvals are never reset.
    threads they came from, as links) to a payload file. cli-runner: `create_draft_pr` from the
    learnings branch to the target branch, linked to the parent item (with the parent reference in
    the description when the adapter links that way), then `set_pr_ready` — docs
-   only, ready for the team's review. Later harvests: `update_pr_description`. Record the PR in
-   `handoffs/learnings.md`, and add it to the Follow-up line of the feature PR's
-   `handoffs/pr-description.md` (that line survives the cleanup), then `update_pr_description`.
+   only, ready for the team's review. Give this description a managed block too, recorded in
+   `handoffs/learnings-pr-description.md`; later harvests update it the same way
+   ([conventions.md](../references/conventions.md) → PR description). Record the PR in
+   `handoffs/learnings.md`, and put it on the Follow-up line of the feature PR's managed block (that
+   line survives the cleanup).
 
 7. **Record and tell the user.** Update `handoffs/learnings.md` (harvested ids, processed
    threads, approval time it covered, follow-up PR). Commit it on the feature branch with the next

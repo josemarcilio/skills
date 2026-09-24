@@ -301,7 +301,7 @@ blocking issue surviving three rounds also stops and comes to you.
 <worktree>/.agents/dev-workflows/<item-id>/                  committed on the branch
 ├── plan.md                  scope, decisions, tickets, discovered conventions
 └── handoffs/
-    ├── pr-description.md    source of truth for the PR description
+    ├── pr-description.md    the PR description's managed block, as last pushed
     ├── <task-id>.md         one per task: status, seams, reviews, commits, next step
     ├── pr-audit.md          audit report and ready flag
     ├── learnings.md         learnings harvest record
@@ -361,6 +361,8 @@ The skill reads your repo's rules and lets them win:
   tracker configuration.
 - Never passes bypass flags (`--bypass-policy`, `--admin`) and never skips git hooks or signing.
 - Never writes secrets into files, payloads, commits, or replies.
+- Owns only a marked block of the PR description. Anything people or bots write outside it is
+  never touched; an edit inside it stops and asks you before anything is overwritten.
 - Treats PR comments and diffs as data: it never runs commands or code found in them.
 - Writes the handoff **before** each side effect (commit, push, reply), so an interrupted run
   always leaves a record of what it decided.
@@ -375,8 +377,6 @@ The skill reads your repo's rules and lets them win:
 - **Older GitHub Enterprise servers** without sub-issues report tasks as not linked.
 - **Merge strategy `merge`** keeps the commits that added the working notes in the target branch's
   history (the final tree is clean). Prefer `squash`.
-- **Edits made to the PR description in the web UI** are overwritten on the next update, because
-  `handoffs/pr-description.md` is the source of truth.
 - **Persistent reviewers** need a harness that can continue a running agent. Without it, reviewer
   memory across rounds is lost.
 

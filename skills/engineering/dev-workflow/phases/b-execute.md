@@ -28,8 +28,8 @@ draft → Phase C.
 
 5. **Close.** Write the handoff first (status `Done`, commits, gotchas, next step for the story),
    then commit (task-scoped, per [conventions.md](../references/conventions.md)) and push.
-   cli-runner: `set_item_state` → `done`. Tick the task in `handoffs/pr-description.md`, then
-   cli-runner: `update_pr_description` with that file.
+   cli-runner: `set_item_state` → `done`. Tick the task in the PR description's managed block
+   ([conventions.md](../references/conventions.md) → PR description → Update).
 
 6. **Scope drift.** When a task duplicates another, or a mid-flight decision makes a task's scope
    wrong: spawn a fresh `planner` (`mode: replan`), confirm with the user, apply via cli-runner
@@ -79,13 +79,14 @@ issues concatenated.
 ## PR audit (after the last task)
 
 1. Confirm every task is ticked in `handoffs/pr-description.md`, the branch is pushed, and
-   `git fetch origin` ran. Note `head_sha`.
+   `git fetch origin` ran. Note `head_sha`. cli-runner: `get_pr_description` into `temp_dir` — the
+   auditor needs the whole description, including the parts people wrote.
 2. Spawn a fresh `general-purpose` agent at tier `capable` with the full text of
    [agents/pr-auditor.md](../agents/pr-auditor.md) and: repo root, worktree, target branch,
-   `head_sha`, `plan.md`, `handoffs/pr-description.md`, test/lint commands.
+   `head_sha`, `plan.md`, the fetched description file, test/lint commands.
 3. Save `handoffs/pr-audit.md` from [templates/audit-handoff.md](../templates/audit-handoff.md)
-   (`Ready: no`); put the result line and top findings in the Audit section of
-   `handoffs/pr-description.md`; `update_pr_description`. Commit, push.
+   (`Ready: no`); put the result line and top findings in the Audit section of the managed block
+   (PR description → Update). Commit, push.
 4. `Blocked` → stay in draft. Show the findings. Fix them as a normal task round (TDD, reviews),
    then re-run the audit fresh. The user may accept a finding instead — record who and why.
 5. `Passed` (or all remaining findings accepted) → cli-runner: `set_pr_ready`, then set
