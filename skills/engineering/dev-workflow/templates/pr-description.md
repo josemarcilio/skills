@@ -10,6 +10,8 @@ Items: <parent item link the code host needs — for example `Refs #12` on GitHu
 
 <Not run yet | Passed on `<sha>` | Blocked on `<sha>` — top findings in one line each>
 
+Follow-up: <review-learnings PR link> | —
+
 ## Working notes
 
 - Plan: `.agents/dev-workflows/<item-id>/plan.md`

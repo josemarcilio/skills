@@ -18,3 +18,4 @@
 - Fix: `<sha>` <message> | —
 - Reply: "<the exact reply posted>" (comment <comment_id>)
 - Resolved: yes | no
+- Learning: <code | tests> — <the general rule, one line> | —

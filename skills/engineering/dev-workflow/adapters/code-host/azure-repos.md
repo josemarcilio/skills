@@ -38,6 +38,19 @@ az repos pr update --id {pr_id} --description "@{description_file}" --output jso
 az repos pr update --id {pr_id} --draft false --output json
 ```
 
+## get_pr_status
+
+```
+az repos pr show --id {pr_id} --output json
+az repos pr reviewer list --id {pr_id} --output json
+```
+- `draft` = `isDraft`; `state` = `status` (`active` → `open`, `completed`, `abandoned`).
+- Reviewer votes: `10` approved, `5` approved with suggestions, `0` no vote, `-5` waiting for
+  author, `-10` rejected. `approved` = yes when no vote is below `0`, every reviewer with
+  `isRequired: true` voted `5` or `10`, and at least one reviewer did.
+- `changes_requested` = yes when any vote is `-5` or `-10`. `approvers` = `displayName` of
+  reviewers who voted `5` or `10`.
+
 ## list_threads
 
 Tier: standard (filters a large JSON reply).

@@ -6,7 +6,8 @@ comments.
 
 It creates the work item and its tasks, sets up a git worktree and a draft PR, builds each task
 with test-driven development and paired reviewer agents, audits the finished PR, answers every
-human review comment thread by thread, and finally removes its own working notes before merging.
+human review comment thread by thread, turns what reviewers taught into rules for next time, and
+finally removes its own working notes before merging.
 
 Everything the agent needs to continue lives in files on the branch, not in chat history. Close
 the session, come back tomorrow, say "continue the work", and it picks up where it stopped.
@@ -58,6 +59,11 @@ the session, come back tomorrow, say "continue the work", and it picks up where 
 - **Answers human reviewers.** It fetches PR comment threads, works them one at a time, fixes what
   should be fixed (with the same TDD and review bar), replies to every thread in short statements,
   and resolves only what is actually addressed. Nobody is left without an answer.
+- **Learns from human reviewers.** When a reviewer's comment states a general rule ("we always
+  validate at the endpoint", "tests here must not mock the repository"), it is tagged as a
+  learning and relayed to the running reviewer agents at once. When the PR is approved, and again
+  before merging, the learnings are curated into edits to your project's own rule docs — delivered
+  as a separate follow-up PR, so the approved feature PR is never touched.
 - **Cleans up before merge.** A final commit removes the plan and handoff files, so the merged
   tree holds only the real work.
 
@@ -77,9 +83,11 @@ flowchart LR
     subgraph C [Phase C · Feedback]
         C1[Human PR threads] --> C2[Fix / reply / resolve<br/>one handoff per thread]
     end
+    C -- approved --> L
+    L[Learnings harvest<br/>follow-up PR with rule edits] --> C
     C --> D
     subgraph D [Phase D · Complete]
-        D1[Remove working notes] --> D2[Merge PR]
+        D0[Final learnings harvest] --> D1[Remove working notes] --> D2[Merge PR]
     end
 ```
 
@@ -97,7 +105,8 @@ Every invocation starts by reading the files on disk and routing to the right ph
 | Audit passed and PR ready | Phase C |
 | You ask to complete the PR | Phase D |
 
-You can always override the route ("check the PR comments", "redo the audit").
+You can always override the route ("check the PR comments", "redo the audit", "harvest the
+learnings").
 
 ## Requirements
 
@@ -130,7 +139,8 @@ Talk to the agent in plain language. Typical phrases:
 | "Continue the work" | Resumes the first unfinished task from its handoff |
 | "Resume task 5678" | Resumes that specific task |
 | "Check the PR comments" | Phase C: works new or updated review threads |
-| "Complete the PR" | Phase D: confirms, cleans up, merges |
+| "Harvest the learnings" | Turns reviewer rules into a follow-up PR against your rule docs |
+| "Complete the PR" | Phase D: final harvest, confirms, cleans up, merges |
 
 A typical multi-day run:
 
@@ -142,7 +152,10 @@ A typical multi-day run:
 3. **Day 4.** Colleagues have reviewed. "Check the PR comments." Each thread gets its own handoff,
    a fix or a reply, and a resolution where appropriate. Threads with new replies get picked up
    again on the next run.
-4. **Day 5.** "Complete the PR." The working notes are removed in one commit, and the PR merges.
+4. **Day 5.** The PR is approved. On the next "check the PR comments", the learnings harvest runs:
+   you approve two rules the reviewers taught, and they go out as a small follow-up PR.
+5. **Day 6.** "Complete the PR." A last harvest catches anything new, the working notes are removed
+   in one commit, and the PR merges.
 
 ## The four phases
 
@@ -191,9 +204,24 @@ until they are fixed or you explicitly accept them.
 Replies are short statements, for example: *"Fixed in `a1b2c3d` — null check moved to the
 parser."*
 
+### Learnings harvest
+
+Runs when the other reviewers approve the PR, always before completing, and whenever you ask.
+
+1. A curator agent reads the thread handoffs and keeps only real rules: general, checkable, and
+   asked for by a human reviewer (or accepted by you). It drops one-offs, taste, and anything your
+   docs already say, and flags any rule that contradicts an existing one.
+2. You approve, edit, or reject each proposed edit. Conflicts need your explicit choice.
+3. Approved edits go to your own rule docs (`AGENTS.md` / `CLAUDE.md`, testing docs) on a
+   **separate branch and PR** from the target branch. Pushing to the approved feature PR could
+   reset its approvals, so it is never touched.
+
+Since the reviewer agents read those same docs, every approved learning is enforced from the next
+story on — for everyone on the team, not just this agent.
+
 ### Phase D — Complete
 
-Runs only when you ask. It checks for unanswered threads, confirms the merge options with you,
+Runs only when you ask. It runs a final learnings harvest, checks for unanswered threads, confirms the merge options with you,
 updates the PR description, commits the removal of `plan.md` and the handoffs, then merges. It
 never bypasses branch policies.
 
@@ -206,6 +234,7 @@ never bypasses branch policies.
 | **reviewer-code** | Reviews production code against project rules | standard | persistent per session |
 | **reviewer-tests** | Reviews test quality: seams, coverage, tautologies, mocks | standard | persistent per session |
 | **pr-auditor** | Claim ledger, hostile-change gate, full audit | capable | fresh per audit |
+| **learnings-curator** | Turns reviewer comments into proposed rule-doc edits | capable | fresh per harvest |
 
 Personas are declared by **tier**, not by model name. `SKILL.md` holds one small table that maps
 tiers to models per harness. To move to another harness, edit that one table.
@@ -237,6 +266,7 @@ blocking issue surviving three rounds also stops and comes to you.
     ├── pr-description.md    source of truth for the PR description
     ├── <task-id>.md         one per task: status, seams, reviews, commits, next step
     ├── pr-audit.md          audit report and ready flag
+    ├── learnings.md         learnings harvest record
     └── pr/<thread-id>.md    one per PR thread: what was asked, found, decided, replied
 ```
 
@@ -269,6 +299,7 @@ How the concepts line up:
 | Iteration | Current sprint | Nearest open milestone |
 | PR ↔ item link | `--work-items` flag | `Refs #<n>` in the description |
 | Resolvable threads | All comment threads | Inline review threads |
+| "Approved" | Required reviewers voted approve, no rejects | Review decision `APPROVED` |
 
 **Adding a platform** (Jira, GitLab, Bitbucket, ...) means adding one adapter file that implements
 every operation of its kind. No phase file changes.
@@ -317,8 +348,9 @@ The skill reads your repo's rules and lets them win:
 dev-workflow/
 ├── SKILL.md              router, agent roster, tier table
 ├── CREDITS.md            upstream sources and licenses
-├── phases/               a-setup · b-execute · c-feedback · d-complete
-├── agents/               cli-runner · planner · reviewer-code · reviewer-tests · pr-auditor
+├── phases/               a-setup · b-execute · c-feedback · d-complete · e-learnings
+├── agents/               cli-runner · planner · reviewer-code · reviewer-tests · pr-auditor ·
+│                         learnings-curator
 ├── adapters/             CONTRACT.md · work-items/* · code-host/*
 ├── references/           tdd.md · conventions.md
 └── templates/            plan · task / thread / audit handoffs · PR description

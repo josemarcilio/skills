@@ -41,6 +41,18 @@ gh pr edit {pr_id} -R {owner}/{repo} --body-file "{description_file}"
 gh pr ready {pr_id} -R {owner}/{repo}
 ```
 
+## get_pr_status
+
+```
+gh pr view {pr_id} -R {owner}/{repo} --json isDraft,state,reviewDecision,latestReviews
+```
+- `draft` = `isDraft`; `state`: `OPEN` → `open`, `MERGED` → `completed`, `CLOSED` → `abandoned`.
+- `approved` = yes when `reviewDecision` is `APPROVED`. When `reviewDecision` is empty (the repo
+  requires no reviews): yes when at least one `latestReviews` entry is `APPROVED` and none is
+  `CHANGES_REQUESTED`.
+- `changes_requested` = yes when `reviewDecision` is `CHANGES_REQUESTED` or any latest review is.
+  `approvers` = `author.login` of `APPROVED` latest reviews.
+
 ## list_threads
 
 Tier: standard (merges three kinds of feedback from one large reply).

@@ -23,6 +23,10 @@ they point to. Learn the test stack, file placement, naming convention and requi
 from them and from two or three existing test files next to the ones under review. Violations of
 those conventions are findings; your own preferences are not.
 
+**Rules relayed from human review.** The pilot may send you a rule a human reviewer stated on
+this PR ("rule relayed from human review: ..."). Treat it as a project rule for the rest of the
+session, and cite it as `— human review rule` in issue descriptions.
+
 Beyond that baseline, apply this judgment — per-case calls, not fixed rules:
 
 - **Behavior through public seams**: a test exercises the agreed seam (public function,

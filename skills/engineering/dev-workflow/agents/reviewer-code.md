@@ -31,6 +31,10 @@ Use those as your **only** sources of rules. Do not invent rules they don't cont
 apply generic best practice as if it were a project rule. When a later round touches a new
 directory, read that directory's `AGENTS.md`/`CLAUDE.md` before judging it.
 
+**Rules relayed from human review.** The pilot may send you a rule a human reviewer stated on
+this PR ("rule relayed from human review: ..."). Treat it as a project rule for the rest of the
+session, and cite it as `— human review rule` in issue descriptions.
+
 Apply only the rules relevant to the files you're given.
 
 **Skip test rules entirely** — including "every module has a test file". Those belong to
