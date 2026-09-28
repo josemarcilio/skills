@@ -18,6 +18,8 @@ Default branch name only if the project has no rule: `<item-id>-<kebab-descripti
 
 ## Worktree
 
+- Stacked PR mode uses two fixed worktrees instead, `worktrees/stack` and `worktrees/notes`
+  ([stacking.md](stacking.md) → Layout on disk). The rules below still apply to both.
 - Path: `<repo-root>/.agents/dev-workflows/<item-id>/worktrees/<slug>`, where `<slug>` is the
   branch name with `/` replaced by `-`.
 - Create: `git worktree add <path> -b <branch> <target-branch>` (after `git fetch`), or the
@@ -105,3 +107,6 @@ between the markers to `handoffs/pr-description.md`.
 
 Completing/merging a PR, deleting branches or worktrees, force-pushing, changing tracker or CLI
 configuration. Everything else in the flow runs without asking once the user started it.
+One exception: in stacked PR mode, `plan.md`'s `Force-push:` line records the user's standing yes
+for `--force-with-lease` pushes of layer branches after a restack
+([stacking.md](stacking.md) → Rules). Any other force-push still needs a fresh yes.

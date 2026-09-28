@@ -5,6 +5,11 @@ documents, delivered as a **separate follow-up PR**. Reviewers read those docume
 approved learning is enforced in every future session. The feature PR is never touched here, so
 its approvals are never reset.
 
+**Stacked** ([stacking.md](../references/stacking.md)): "the feature PR" means every layer PR,
+and "the feature branch" means the notes branch for records. The thread handoffs are every
+`handoffs/L<n>/pr/` folder — pass them all to the curator. The Follow-up line goes on the top open
+layer's managed block. Never edit rule documents on a layer branch.
+
 ## When it runs
 
 - **On approval** — Phase C finds `get_pr_status` `approved: yes` and the approval is newer than

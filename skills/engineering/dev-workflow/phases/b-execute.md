@@ -6,12 +6,20 @@ paused and resumed alone from its handoff. After the last task, run the PR audit
 **Exit:** every task `Done`, `handoffs/pr-audit.md` `Passed` or `Accepted by user`, PR out of
 draft → Phase C.
 
+**Stacked** ([stacking.md](../references/stacking.md)): each task is one layer. Code is built and
+committed in the stack worktree, on that layer's branch; `plan.md` and handoffs are read and
+committed in the notes worktree. Each layer is audited and leaves draft **as soon as its task is
+done**, so reviewers start on the lower layers while the upper ones are built. Exit: every layer
+`review` with its `handoffs/L<n>/pr-audit.md` `Ready: yes` → Phase C.
+
 ## Per task
 
 1. **Start.** cli-runner: `set_item_state` → `active` (task `state_map` from `plan.md`). Create
    `handoffs/<task-id>.md` from [templates/task-handoff.md](../templates/task-handoff.md), copying
    acceptance criteria and candidate seams from the task's Tickets block in `plan.md` — or open the
    existing one and resume from its **Next step** and seam statuses. Status `In progress`.
+   **Stacked:** switch the stack worktree to the task's layer branch, creating it first if it
+   doesn't exist yet (stacking.md → Start a layer). The layer below must be `Done` first.
 
 2. **Seams.** Show the task's candidate seams; confirm or adjust with the user. Record them in the
    handoff. If the code area is unfamiliar, do a read-only exploration first and mirror the
@@ -30,12 +38,19 @@ draft → Phase C.
    then commit (task-scoped, per [conventions.md](../references/conventions.md)) and push.
    cli-runner: `set_item_state` → `done`. Tick the task in the PR description's managed block
    ([conventions.md](../references/conventions.md) → PR description → Update).
+   **Stacked:** commit on the layer branch and push it (`-u origin` the first time). No layer PR
+   yet → open it now (stacking.md → Open a layer PR) and record it in the Stack table. Tick the
+   task in that layer's block, then run the **PR audit** below for this layer before starting the
+   next task.
 
 6. **Scope drift.** When a task duplicates another, or a mid-flight decision makes a task's scope
    wrong: spawn a fresh `planner` (`mode: replan`), confirm with the user, apply via cli-runner
    (`update_item`, `set_item_state` → `removed`, `create_child_item`). Update the Tasks table and
    Tickets blocks in `plan.md` (the only edit allowed after setup besides Changes), append one line
    to Changes and to the affected handoffs. Never pad work to match a stale plan.
+   **Stacked:** new tasks go on top of the stack. A closed task that is not built yet → remove its
+   row from the Stack table. A closed task already built, or any change that would reorder built
+   layers → ask the user first; dropping a built layer means a rebase and closing its PR.
 
 ## Review rounds
 
@@ -77,6 +92,15 @@ issues concatenated.
   is, what you tried, and why it isn't resolving.
 
 ## PR audit (after the last task)
+
+**Stacked:** runs once per layer, right after that layer's task closes, with these changes:
+`base_branch` = the layer's current base from the Stack table, `trusted_branch` = the target
+branch, `ticket_refs` = that layer's ticket, the description of that layer's PR, `head_sha` = the
+layer branch tip. Records go to `handoffs/L<n>/pr-audit.md` and that layer's managed block. Step 5
+readies only that layer's PR and sets its Stack state to `review`; tell the user the layer is
+ready for review. Set the parent item's state only after the last layer. A restack that changes a
+layer's own diff re-runs its audit (stacking.md → Restack, step 6); one that doesn't adds a line
+`Restacked on <sha>, own diff unchanged` to its `pr-audit.md`.
 
 1. Confirm every task is ticked in `handoffs/pr-description.md`, the branch is pushed, and
    `git fetch origin` ran. Note `head_sha`. cli-runner: `get_pr_description` into `temp_dir` — the

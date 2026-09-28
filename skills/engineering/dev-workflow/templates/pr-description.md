@@ -23,4 +23,20 @@ Follow-up: <review-learnings PR link> | —
 These notes are removed by a cleanup commit before merge.
 <!-- dev-workflow:end -->
 
+<!-- Stacked mode: one block per layer PR. Replace the Tasks section with the two sections below,
+     and the Working notes lines with: Plan and handoffs on branch `<notes-branch>`
+     (`.agents/dev-workflows/<item-id>/`), never merged. Items: the parent and this layer's task.
+
+## Stack
+
+Review bottom-up. Each PR shows only its own layer.
+
+1. [<pr-id>](<url>) L1 — <task title> · merged | in review | draft
+2. **[<pr-id>](<url>) L2 — <task title> · this PR**
+
+## Task
+
+- [ ] [<task-id>](<url>) <title>
+-->
+
 <Project-required PR footer or attribution, if any. Outside the block, like the summary.>

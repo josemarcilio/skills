@@ -103,3 +103,19 @@ Gotchas: branch policies (required reviewers, builds) can block completion — r
 message. **Never pass `--bypass-policy`.** A completed status may take a moment to show a merge
 commit; read `lastMergeCommit.commitId` from a follow-up
 `az repos pr show --id {pr_id} --output json`.
+
+## set_pr_target
+
+`az repos pr update` can't change the target branch; use the REST route. Write `{target_json}`:
+`{"targetRefName": "refs/heads/{target_branch}"}`
+```
+az devops invoke --area git --resource pullRequests --route-parameters project={project} repositoryId={repo} pullRequestId={pr_id} --http-method PATCH --in-file "{target_json}" --api-version 7.1 --output json
+```
+Returns `target_branch` from `targetRefName` without `refs/heads/`.
+Gotchas: deleting a branch that an open PR targets leaves that PR broken — the caller retargets
+first. The PR's existing votes stay; the diff is recomputed against the new target.
+
+## link_stack
+
+Azure Repos has no native stacks. Run nothing; return `status: unsupported` with `STATUS: OK`.
+The stack works through the PR target branches alone.

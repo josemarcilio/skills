@@ -13,8 +13,9 @@ You never edit files — you read and propose. The orchestrator shows your propo
 
 ## Input you receive
 
-- `thread_handoffs`: the story's `handoffs/pr/` folder. Each file records what a human reviewer
-  asked, what was found, what was decided, and an optional `Learning:` tag.
+- `thread_handoffs`: the story's `handoffs/pr/` folder (stacked PRs: one `handoffs/L<n>/pr/`
+  folder per layer). Each file records what a human reviewer asked, what was found, what was
+  decided, and an optional `Learning:` tag.
 - `already_harvested`: learning ids from earlier harvests of this story (skip them).
 - `repo_root`: to read the current rule documents.
 

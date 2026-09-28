@@ -61,6 +61,14 @@ real state names using `state_map` — the `states_parent` or `states_task` stri
 | `reply_thread` | `pr_id`, `thread_id`, `body_file` | `thread_id`, `comment_id` |
 | `resolve_thread` | `pr_id`, `thread_id` | `thread_id`, `status` |
 | `complete_pr` | `pr_id`, `source_branch`, `merge_strategy` (`squash` / `merge` / `rebase`), `delete_source_branch` | `pr_id`, `status`, `merge_commit` |
+| `set_pr_target` | `pr_id`, `target_branch` | `pr_id`, `target_branch` |
+| `link_stack` | `target_branch`, `pr_ids` (bottom first) | `status` (`linked` / `unsupported`) |
+
+`set_pr_target` and `link_stack` are used only in stacked PR mode
+(`references/stacking.md`). `set_pr_target` retargets an open PR to another base branch — after
+the layer below it merges. `link_stack` registers the layer PRs as one stack on hosts with native
+stack support; hosts without it return `status: unsupported` with `STATUS: OK`, and the stack
+still works through PR bases alone.
 
 `list_threads` must drop system/bot threads (status changes, votes, pushes) and return only
 threads a person wrote.

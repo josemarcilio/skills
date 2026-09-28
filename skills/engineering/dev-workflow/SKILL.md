@@ -1,6 +1,6 @@
 ---
 name: dev-workflow
-description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR, builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, turns reviewers' general rules into a follow-up PR against the project's rule docs, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps and GitHub included). Use when the user says "start this work", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
+description: Runs a piece of work end to end and resumably — creates the work item and INVEST tasks, a worktree and draft PR (or, optionally, one stacked PR per task for smaller reviews), builds each task with TDD and paired reviewer agents, audits the PR, answers human PR comments thread by thread, turns reviewers' general rules into a follow-up PR against the project's rule docs, and completes the PR. State lives in per-task and per-thread handoff files, so work can stop and resume on any day. Tracker-agnostic through adapters (Azure DevOps and GitHub included). Use when the user says "start this work", "stack the PRs", "set up the PBI/story/ticket", "continue the work", "check the PR comments", "resume task X", or "complete the PR".
 ---
 
 # Dev workflow
@@ -53,15 +53,29 @@ worktree/.agents/dev-workflows/<item-id>/                          committed on 
 
 Nothing depends on chat memory: every run starts by reading these files in the worktree.
 
+**Stacked PR mode** (optional, chosen at setup): one PR per task, each stacked on the one below.
+The notes then live in a separate notes worktree, code in a stack worktree, and each layer PR has
+its own `handoffs/L<n>/` folder. See [references/stacking.md](references/stacking.md).
+
 ## Route each invocation
 
 1. Resolve `<item-id>`: the user's words → the current branch → `git worktree list`. None and the
-   user is starting new work → **Phase A**. Otherwise ask.
+   user is starting new work → **Phase A**. Otherwise ask. A `worktrees/notes` worktree for the
+   item → stacked mode: read `plan.md` there.
 2. No `plan.md` but the branch has the cleanup commit → **Phase D** (it resumes).
 3. No worktree, no `plan.md`, or `plan.md` says `Setup: in progress` → **Phase A** (it resumes).
 4. A task in `plan.md` without a `Done` handoff → **Phase B**, that task or the one named.
 5. All tasks `Done`, `pr-audit.md` missing or not `Ready: yes` → **Phase B → PR audit**.
 6. `Ready: yes` → **Phase C**. User asks to complete → **Phase D**.
+
+**Stacked** (`PR mode: stacked`): rule 2 doesn't apply; rules 4–6 become, per layer bottom-up,
+skipping `merged` layers:
+
+- a task `Done` whose `handoffs/L<n>/pr-audit.md` is missing or not `Ready: yes` → **Phase B →
+  PR audit** for that layer;
+- else the first task without a `Done` handoff → **Phase B**, that task;
+- every open layer `review` → **Phase C**. User asks to complete → **Phase D** (stacked
+  completion).
 
 The user's explicit request ("check the comments", "redo the audit", "harvest the learnings")
 overrides the route. Say
@@ -77,6 +91,7 @@ which phase you're entering and why, in one line.
 
 ## Always
 
+- In stacked mode, also follow [references/stacking.md](references/stacking.md).
 - Follow [references/conventions.md](references/conventions.md): discover project rules, never
   guess; `<user-home>` in written paths; handoff before side effect; confirm before merging or
   deleting.

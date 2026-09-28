@@ -6,6 +6,12 @@ Each thread has its own handoff, so the work can stop and resume at any thread.
 **Exit:** every human thread answered, nothing new since the last run → wait, or Phase D when
 the user asks to complete.
 
+**Stacked** ([stacking.md](../references/stacking.md)): run the steps for every layer PR in the
+Stack table with state `review`, bottom-up, and use `handoffs/L<n>/pr/<thread-id>.md` as the
+thread handoff (thread ids are only unique per PR on some hosts). This phase can run while upper
+layers are still being built — the user asks "check the PR comments" at any time. Before the first
+fix, the stack worktree needs a clean tree (stacking.md → Restack, step 1).
+
 ## Steps
 
 1. **Fetch.** cli-runner (tier `standard`): `list_threads` and `get_pr_status` with `pr_id` and
@@ -21,6 +27,7 @@ the user asks to complete.
 3. **Dig in.** Read the comment and the code it points to — the current code, not only the diff
    line. Check the claim: is the reviewer right, partly right, or missing context? Look for the
    same issue elsewhere in the PR.
+   **Stacked:** also check the other layers — the same issue may sit in a lower or higher layer.
 
 4. **Decide** one of:
    - **fix** — the concern is valid and in scope;
@@ -41,6 +48,10 @@ the user asks to complete.
    ([references/tdd.md](../references/tdd.md)), review rounds with the same reviewers (reused if
    alive this session), verification gate. Commit — referencing the thread — and push. Put the
    commit sha in the handoff entry.
+   **Stacked:** commit the fix on the layer that owns the code — usually the thread's own layer,
+   but a lower layer when the fix belongs there — then restack everything above it
+   (stacking.md → Restack) instead of a plain push. A fix in another layer: say so in the reply,
+   with that layer's PR link.
 
 7. **Reply.** Write the reply to a payload file — short phrase statements per
    [conventions.md](../references/conventions.md) → PR replies. cli-runner: `reply_thread`. Then,
@@ -54,6 +65,7 @@ the user asks to complete.
 
 9. **Approval trigger.** If step 1 returned `approved: yes` and `handoffs/learnings.md` has no
    harvest covering this approval, run the [learnings harvest](e-learnings.md), then stop.
+   **Stacked:** the trigger is every open layer returning `approved: yes`.
 
 ## Rules
 

@@ -71,6 +71,8 @@ the session, come back tomorrow, say "continue the work", and it picks up where 
   as a separate follow-up PR, so the approved feature PR is never touched.
 - **Cleans up before merge.** A final commit removes the plan and handoff files, so the merged
   tree holds only the real work.
+- **Optionally stacks the PRs.** At setup you choose one PR for the whole item, or one small PR
+  per task, each stacked on the one below. See [Stacked PRs](#stacked-prs).
 
 ## How it works
 
@@ -95,6 +97,10 @@ flowchart LR
         D0[Final learnings harvest] --> D1[Remove working notes] --> D2[Merge PR]
     end
 ```
+
+This is the default single-PR flow. In [stacked PR mode](#stacked-prs) the same phases run per
+layer: each task opens its own PR, is audited and leaves draft on its own, and the layers merge
+bottom-up.
 
 ### Inside one task
 
@@ -142,6 +148,9 @@ Every invocation starts by reading the files on disk and routing to the right ph
 | Audit passed and PR ready | Phase C |
 | You ask to complete the PR | Phase D |
 
+In stacked mode the same checks run per layer, bottom-up, and merged layers are skipped: a done
+task whose layer isn't audited yet goes to the audit before the next task starts.
+
 You can always override the route ("check the PR comments", "redo the audit", "harvest the
 learnings").
 
@@ -172,6 +181,7 @@ Talk to the agent in plain language. Typical phrases:
 | You say | What happens |
 |---|---|
 | "Start this work" + a plan | Phase A: item, tasks, worktree, `plan.md`, draft PR |
+| "Start this work, stack the PRs" | The same, but one stacked PR per task (asked anyway at setup) |
 | "Start this work on PBI 1234" | Same, using an existing item as the parent |
 | "Continue the work" | Resumes the first unfinished task from its handoff |
 | "Resume task 5678" | Resumes that specific task |
@@ -209,6 +219,10 @@ A typical multi-day run:
 6. Creates one child task per ticket, linked to the parent.
 7. Opens a draft PR linked to the parent item.
 
+Before step 1 it asks for the PR mode: one PR, or one stacked PR per task. In stacked mode, step 4
+creates a notes worktree and step 5 also sets the stack order and creates the stack worktree on the
+first layer's branch. Step 7 is skipped — each layer PR opens when its task first pushes.
+
 Results are written to `plan.md` before each next step, so an interrupted setup resumes without
 creating duplicates.
 
@@ -230,6 +244,10 @@ stale plan.
 After the last task, the **PR audit** runs. `CRITICAL` or `BLOCKING` findings keep the PR in draft
 until they are fixed or you explicitly accept them.
 
+In stacked mode each task is built on its own layer branch. When it closes, the layer PR opens
+(targeting the layer below), is audited on its own diff, and leaves draft right away — before the
+next task starts.
+
 ### Phase C — Reviewer feedback
 
 1. Fetches the human review threads (bot and system events are dropped).
@@ -241,6 +259,10 @@ until they are fixed or you explicitly accept them.
 
 Replies are short statements, for example: *"Fixed in `a1b2c3d` — null check moved to the
 parser."*
+
+In stacked mode it works every layer PR in review, bottom-up, even while upper layers are still
+being built. A fix is committed on the layer that owns the code; the layers above are restacked
+and force-pushed with lease.
 
 ### Learnings harvest
 
@@ -262,6 +284,39 @@ story on — for everyone on the team, not just this agent.
 Runs only when you ask. It runs a final learnings harvest, checks for unanswered threads, confirms the merge options with you,
 updates the PR description, commits the removal of `plan.md` and the handoffs, then merges. It
 never bypasses branch policies.
+
+In stacked mode it merges layers one at a time, bottom-up, as far as you say — possibly on
+different days. After each merge it retargets the next PR to the target branch (and restacks with
+`squash` or `rebase`). There is no cleanup commit; at the end it offers to delete the notes branch.
+
+## Stacked PRs
+
+Optional, chosen once at the start of setup. Based on GitHub's
+[stacked PRs guide](https://docs.github.com/en/copilot/tutorials/stack-ai-generated-code-in-pull-requests).
+Details in [`references/stacking.md`](references/stacking.md).
+
+```
+main ← L1 (task 1) ← L2 (task 2) ← L3 (task 3)
+```
+
+- **One layer = one INVEST task = one PR.** Each PR targets the branch below it, so its diff shows
+  only that task. Tasks stay vertical slices; the stack order is a review order, not a dependency.
+- **Reviews start early.** Each layer is audited and leaves draft as soon as its task is done, so
+  people review L1 while L2 is built.
+- **Fixes stay in their layer.** A fix to L1 is committed on L1; the layers above are replayed with
+  `git rebase --update-refs` and pushed with `--force-with-lease` (you approve this once, at
+  setup).
+- **Merges go bottom-up.** After L1 merges, L2 is retargeted to `main` and still shows only its own
+  diff. The last PR never holds the whole feature.
+- **Notes live on a separate notes branch** that never gets a PR, so layer branches hold only real
+  work and need no cleanup commit.
+- **Works on both hosts.** Plain git and PR target branches do the stacking. On GitHub, if the
+  [`gh-stack`](https://github.com/github/gh-stack) extension is installed, the layers are also
+  linked as a native stack.
+
+Costs: more PRs to track, force-pushes after lower-layer fixes, and — with `squash` or `rebase`
+merges — a restack after every merge, which can reset approvals where the repo dismisses stale
+reviews. Each layer lands in `main` as it merges, so each must be safe to ship alone.
 
 ## Agents and model tiers
 
@@ -314,6 +369,21 @@ blocking issue surviving three rounds also stops and comes to you.
 - Everything under `.agents/dev-workflows/<item-id>/` is deleted in the cleanup commit before
   merge.
 
+In stacked mode, the notes move to their own branch, and each layer PR gets its own folder:
+
+```
+<repo>/.agents/dev-workflows/<item-id>/worktrees/
+├── stack/                   one worktree, switched between the layer branches
+└── notes/                   the notes branch (pushed, never a PR, deleted at the end)
+
+<notes worktree>/.agents/dev-workflows/<item-id>/
+├── plan.md                  as above, plus the PR mode, force-push approval and Stack table
+└── handoffs/
+    ├── <task-id>.md         one per task
+    ├── learnings.md
+    └── L<n>/                one per layer PR: pr-description.md, pr-audit.md, pr/<thread-id>.md
+```
+
 ## Adapters
 
 Phases never call a CLI directly. They call named operations (`create_child_item`,
@@ -325,7 +395,7 @@ There are two independent kinds:
 | Kind | Included | Maps |
 |---|---|---|
 | **work-items** | [`azure-boards`](adapters/work-items/azure-boards.md), [`github-issues`](adapters/work-items/github-issues.md) | parent item → child tasks, states, iterations |
-| **code-host** | [`azure-repos`](adapters/code-host/azure-repos.md), [`github`](adapters/code-host/github.md) | draft PR, description, review threads, merge |
+| **code-host** | [`azure-repos`](adapters/code-host/azure-repos.md), [`github`](adapters/code-host/github.md) | draft PR, description, review threads, merge; for stacked PRs, retargeting and stack linking |
 
 How the concepts line up:
 
@@ -338,6 +408,8 @@ How the concepts line up:
 | PR ↔ item link | `--work-items` flag | `Refs #<n>` in the description |
 | Resolvable threads | All comment threads | Inline review threads |
 | "Approved" | Required reviewers voted approve, no rejects | Review decision `APPROVED` |
+| Retarget a PR (stacked) | REST `PATCH` on the PR's `targetRefName` | `gh pr edit --base` |
+| Native stack (stacked) | none — PR target branches only | `gh stack link`, if the `gh-stack` extension is installed |
 
 **Adding a platform** (Jira, GitLab, Bitbucket, ...) means adding one adapter file that implements
 every operation of its kind. No phase file changes.
@@ -374,7 +446,9 @@ The skill reads your repo's rules and lets them win:
   iterations.
 - **Older GitHub Enterprise servers** without sub-issues report tasks as not linked.
 - **Merge strategy `merge`** keeps the commits that added the working notes in the target branch's
-  history (the final tree is clean). Prefer `squash`.
+  history (the final tree is clean). Prefer `squash`. In stacked mode the notes never touch the
+  layer branches, so `merge` is clean — and it avoids a restack after every merge.
+- **Stacked PRs** need git 2.38+. GitHub's native stacks (`gh-stack`) are in public preview.
 - **Persistent reviewers** need a harness that can continue a running agent. Without it, reviewer
   memory across rounds is lost.
 
@@ -388,7 +462,7 @@ dev-workflow/
 ├── agents/               cli-runner · planner · reviewer-code · reviewer-tests · pr-auditor ·
 │                         learnings-curator
 ├── adapters/             CONTRACT.md · work-items/* · code-host/*
-├── references/           tdd.md · conventions.md
+├── references/           tdd.md · conventions.md · stacking.md
 └── templates/            plan · task / thread / audit handoffs · PR description
 ```
 

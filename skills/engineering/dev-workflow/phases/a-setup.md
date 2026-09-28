@@ -3,6 +3,8 @@
 From "start this work" to a linked item, child tasks, a worktree, `plan.md`, and a draft PR.
 
 **Exit:** `plan.md` with `Setup: complete` committed on the branch, draft PR open → Phase B.
+**Stacked:** `plan.md` committed on the notes branch, stack worktree on the `L1` branch, no PR yet
+(layer PRs open in Phase B) → Phase B.
 
 ## Inputs — ask if missing, never guess
 
@@ -13,6 +15,7 @@ From "start this work" to a linked item, child tasks, a worktree, `plan.md`, and
 - **Assignee**: who to assign items to (usually the user), in the tracker's format — a display
   name for Azure Boards, a login or `@me` for GitHub.
 - **Team / owner**: only if the tracker or branch pattern needs it.
+- **PR mode**: asked in step 0.
 
 ## Resuming
 
@@ -26,6 +29,13 @@ No `plan.md` yet but the user started this work before → ask whether a parent 
 created (step 3 always reports its id) before creating one.
 
 ## Steps
+
+0. **PR mode.** Ask once: one PR for the whole item (`single`), or one stacked PR per task
+   (`stacked`)? Give the recommendation and the costs from
+   [stacking.md](../references/stacking.md) → When to offer it. `stacked` also needs the user's
+   standing yes for `--force-with-lease` pushes of layer branches — no yes → `single`. Record both
+   answers in `plan.md` at step 4 (they live only in chat until then). In a resumed setup, read
+   them from `plan.md` instead.
 
 1. **Adapters and context.** Choose adapters ([CONTRACT.md](../adapters/CONTRACT.md) →
    "Choosing adapters"). cli-runner: `detect_context`. If not configured, stop and show the
@@ -51,11 +61,20 @@ created (step 3 always reports its id) before creating one.
    inside the worktree at `.agents/dev-workflows/<item-id>/plan.md`: `Setup: in progress`, header
    values from steps 1–3, Scope, Decisions. From here on, every result is written to `plan.md`
    before the next side effect.
+   **Stacked:** create the **notes** worktree instead, on the notes branch
+   ([stacking.md](../references/stacking.md) → Layout on disk), and write `plan.md` there with
+   `PR mode: stacked` and the `Force-push:` line. The stack worktree waits for step 5 — the `L1`
+   branch is named after the first task.
 
 5. **Tickets.** Spawn `planner` (tier `capable`, `mode: initial`) with the plan and repo root.
    Relay its questions to the user and its follow-ups back, until the user approves and the
    planner returns `status: final`. Write the Tasks table (ids `pending`) and one Tickets block
    per ticket into `plan.md`.
+   **Stacked:** pass `pr_mode: stacked`. Write the Tasks table in `stack_order`, the stack note
+   into Decisions, and the Stack table (one row per task, branch names per
+   [stacking.md](../references/stacking.md), PR `—`, state `building`; only `L1`'s base is set).
+   Then create the stack worktree at `.agents/dev-workflows/<item-id>/worktrees/stack` on the `L1`
+   branch from the target branch, and verify its name.
 
 6. **Child tasks.** Per ticket write one description file: "what to build" plus an "Acceptance
    criteria" list. Dispatch **one** cli-runner step: `create_child_item` for every ticket still
@@ -63,6 +82,8 @@ created (step 3 always reports its id) before creating one.
    Tasks table.
 
 7. **Commit and push.** Commit `plan.md`; push with `git push -u origin <branch>`.
+   **Stacked:** commit and push the notes branch. The `L1` branch is pushed with its first task
+   commit.
 
 8. **Draft PR.** Fill [templates/pr-description.md](../templates/pr-description.md) into a payload
    file and save its managed block to `handoffs/pr-description.md`, per
@@ -72,5 +93,8 @@ created (step 3 always reports its id) before creating one.
    code-host adapter links items through the description (GitHub), write the parent reference it
    asks for into the Items line first. Record the
    PR in `plan.md`, set `Setup: complete`, commit, push.
+   **Stacked:** skip — a PR needs at least one commit, so each layer PR opens when its task first
+   pushes. Set `Setup: complete`, commit, push the notes branch.
 
 9. **Tell the user**: item and PR links, task list, worktree path. Next: Phase B.
+   **Stacked:** the stack order with one line on why, and both worktree paths.

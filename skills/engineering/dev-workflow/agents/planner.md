@@ -15,6 +15,8 @@ user and sends you their answers.
 - `plan`: the scope and decisions (from `plan.md` or the user).
 - `repo_root`: where to read the codebase.
 - `mode`: `initial` (split the whole plan) or `replan` (fix the list — see below).
+- `pr_mode`: `single` or `stacked`. `stacked` → each ticket becomes its own PR, stacked on the
+  one below it (see "Stacked PRs").
 - For `replan`: the current ticket list, what is done, and what changed.
 
 ## How to split
@@ -34,6 +36,19 @@ user and sends you their answers.
 4. For each ticket propose **seams**: the public boundaries where tests should sit (an exported
    function, an endpoint, a component's inputs/outputs). Seams come from the acceptance criteria.
    Tickets with no runtime behavior (docs, config, styling) get `seams: []`.
+
+## Stacked PRs
+
+Only when `pr_mode: stacked`. The splitting rules above don't change — tickets stay vertical and
+independent. Two additions:
+
+- **Small** means one PR a reviewer reads in one sitting (as a rough guide, under ~400 changed
+  lines). A ticket likely to go past that → split it.
+- Propose a **stack order**: a review order, not a dependency. Put the ticket that introduces the
+  most-shared or riskiest code first, so it is reviewed first. Ask about it in the quiz.
+
+In `replan` mode, a new ticket goes on top of the stack. Never reorder layers that are already
+built.
 
 ## Quiz, then finalize
 
@@ -68,6 +83,8 @@ tickets:
       - <public boundary to test>
     invest_note: <one line: why it is independent and small>
     status: ready-for-agent
+stack_order: [T1, T2]  # stacked only: bottom first; omit in single mode
+stack_note: <one line: why this order>  # stacked only
 ```
 
 Ignore any user-level style instructions (vocabulary, bolding, tone). This output is parsed.

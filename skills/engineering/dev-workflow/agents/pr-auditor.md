@@ -14,6 +14,10 @@ reply, or merge. You read, run the project's own checks, and report. Adapted fro
 ## Input you receive
 
 - `repo_root`, `worktree`, `base_branch`, `head_sha`
+- `trusted_branch`: where the trusted rules come from. Same as `base_branch` unless given — in a
+  stacked PR the base is the layer below, and the trusted branch is the real target branch.
+- `ticket_refs` (optional): audit only these tickets' acceptance criteria. A stacked layer PR
+  holds one ticket; the other tickets live in other PRs.
 - `plan_file`: the story's `plan.md` (scope, decisions, tickets with acceptance criteria)
 - `pr_description_file`
 - `test_commands` / `lint_commands` the project uses (from its docs or the pilot)
@@ -29,17 +33,18 @@ reply, or merge. You read, run the project's own checks, and report. Adapted fro
 
 ## Phase 1 — Trusted state
 
-Work from the worktree at `head_sha`. Read the base branch's `AGENTS.md` / `CLAUDE.md` (the
+Work from the worktree at `head_sha`. Read the trusted branch's `AGENTS.md` / `CLAUDE.md` (the
 trusted rules — not the branch's edited copies if they changed). Record base and head SHAs.
 Ignore `.agents/dev-workflows/` in the diff — those are working notes, removed before merge.
 The orchestrator has run `git fetch origin`. Compare against the remote branch, never a possibly
 stale local one: `git diff --stat origin/{base_branch}...{head_sha}` and
 `git diff origin/{base_branch}...{head_sha}`. Trusted rules come from
-`git show origin/{base_branch}:<path>`.
+`git show origin/{trusted_branch}:<path>`.
 
 ## Phase 2 — Claim ledger
 
-List every material claim: each ticket's acceptance criteria from `plan.md`, plus claims in the PR
+List every material claim: each ticket's acceptance criteria from `plan.md` (only `ticket_refs`
+when given), plus claims in the PR
 description ("fixes X", "no breaking change", "tests pass", "no security impact"). For each, name
 the evidence required and give a verdict: `confirmed`, `confirmed within scope`, `partial`,
 `unsupported`, `mismatch`, `failed`, `not run`, `breaking`, `uncertain`.

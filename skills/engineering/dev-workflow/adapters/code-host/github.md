@@ -152,3 +152,27 @@ gh pr view {pr_id} -R {owner}/{repo} --json state,mergeCommit
   directory, which fails inside a worktree.
 - Required checks or reviews block the merge — report the message. **Never pass `--admin`.**
 - Returns `status` = `state` (`MERGED`), `merge_commit` = `mergeCommit.oid`.
+
+## set_pr_target
+
+```
+gh pr edit {pr_id} -R {owner}/{repo} --base "{target_branch}"
+```
+Returns `target_branch` as given. GitHub also retargets a PR on its own when its base branch is
+deleted after a merge; calling this first is still required — it makes the order explicit and
+harmless to repeat.
+
+## link_stack
+
+Registers the layer PRs as a native GitHub stack with the
+[`gh-stack`](https://github.com/github/gh-stack) extension (public preview).
+```
+gh extension list
+gh stack link --base "{target_branch}" {pr_ids}
+```
+- `github/gh-stack` missing from the first command's output → skip the second; return
+  `status: unsupported` with `STATUS: OK`. The stack still works through the PR bases.
+- `{pr_ids}` space-separated, bottom first. Re-running with one more PR on top updates the stack.
+- **Never pass `--open`**: it marks every PR ready, skipping the layer audits.
+- Gotchas: preview feature. If GitHub refuses a later edit or merge because of the stack, report
+  the message; never run `gh stack unstack` or other `gh stack` commands to get around it.

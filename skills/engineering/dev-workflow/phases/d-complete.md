@@ -5,6 +5,8 @@ the final tree holds only the real work, then completes the PR.
 
 **Exit:** PR completed; worktree removed if the user agreed.
 
+**Stacked:** follow [Stacked completion](#stacked-completion) below instead of the steps.
+
 ## Resuming
 
 If `plan.md` is gone but the branch has the cleanup commit, the values are still readable:
@@ -43,3 +45,36 @@ again (step 3 — the earlier answers lived only in chat), then continue at step
    merge and the tracker didn't already. Offer to remove the worktree (`git worktree remove
    <path>`) — and the learnings worktree once its follow-up PR is merged or closed — and, if no other worktrees remain under `.agents/dev-workflows/`, the
    `.git/info/exclude` line. Deleting only on a yes.
+
+## Stacked completion
+
+Layers merge one at a time, strictly bottom-up, into the target branch
+([stacking.md](../references/stacking.md)). They can merge on different days: each run merges
+from the bottom open layer up to where the user says to stop. There is no cleanup commit — the
+notes never touched the layer branches.
+
+**Resuming:** a layer in state `merging` → cli-runner `get_pr_status` on its PR. `completed` →
+continue at step 5 for it. `open` → it didn't merge; start again at step 1.
+
+1. **Which layers.** Ask how far: the bottom open layer only, or every approved layer in order.
+2. **Pre-check** each chosen layer, bottom-up: cli-runner `list_threads` (the checks of step 1
+   above, on `handoffs/L<n>/pr/`) and `get_pr_status`. The first layer not approved, or with
+   unanswered threads the user doesn't wave through, is where this run stops.
+3. **Harvest learnings** only when the chosen layers include the top open layer — the last
+   chance, as the notes branch is deleted afterwards. Otherwise later layers may still get
+   comments.
+4. **Confirm once** for the whole run: the layers in order, the merge strategy, delete merged
+   branches yes/no. With `squash` or `rebase`, warn that after each merge the layers above are
+   restacked and force-pushed, which can reset their approvals where the repo dismisses stale
+   reviews. Wait for an explicit yes.
+5. **Per layer, bottom-up:**
+   1. Final description: update that layer's managed block without the Working notes line.
+   2. Set the layer's Stack state to `merging`; commit the notes.
+   3. cli-runner: `complete_pr` with `delete_source_branch: false` — the next layer's PR still
+      targets this branch. Policy block → report it, stop the run.
+   4. stacking.md → After a lower layer merged (retarget, restack if needed, delete the branch if
+      agreed, Stack table, other layers' Stack sections). Commit and push the notes.
+6. **After the last layer:** set the parent item to `done` (as step 7 above). Offer to delete the
+   notes branch (`git push origin --delete <notes-branch>`), then remove the stack and notes
+   worktrees (and the learnings worktree once its PR is merged or closed), and the
+   `.git/info/exclude` line if no other worktrees remain. Deleting only on a yes.
