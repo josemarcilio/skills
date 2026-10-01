@@ -40,6 +40,11 @@ created (step 3 always reports its id) before creating one.
 1. **Adapters and context.** Choose adapters ([CONTRACT.md](../adapters/CONTRACT.md) →
    "Choosing adapters"). cli-runner: `detect_context`. If not configured, stop and show the
    user the configure command from the adapter.
+   Decisions: run the `ollama` adapter's `health --model tev1` yourself (the user may name another
+   model). `available: yes` → record `decisions=ollama (model <model from the result>)` at step 4.
+   `available: no`, a non-zero exit, or no `STATUS:` block → `none`; tell the user the reason in
+   one line and point to [ollama.md](../adapters/decisions/ollama.md) → Setup. Never install or
+   pull anything, and never stop setup over it.
 
 2. **Conventions.** cli-runner (tier `standard`): `discover_conventions` (sample = the given item,
    or ask the user for any recent item id in the same project) and `current_iteration`. Discover

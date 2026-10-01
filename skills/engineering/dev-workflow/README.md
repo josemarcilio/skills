@@ -165,6 +165,10 @@ learnings").
   - GitHub: [GitHub CLI](https://cli.github.com/) (`gh auth login`).
 - **A plan to start from.** The skill does not invent scope. Bring a plan from a grilling or spec
   session, a design doc, or your own description.
+- **Optional: a local decision model** for PR-thread signals —
+  [Ollama](https://ollama.com/download) 0.35+, `ollama pull tev1`, and
+  [uv](https://docs.astral.sh/uv/). Without it, everything works the same; see
+  [Decision signals](#decision-signals-optional).
 
 ## Install
 
@@ -251,7 +255,9 @@ next task starts.
 ### Phase C — Reviewer feedback
 
 1. Fetches the human review threads (bot and system events are dropped).
-2. Compares each with its handoff to find new threads and new replies.
+2. Compares each with its handoff to find new threads and new replies. With a
+   [decision model](#decision-signals-optional), it also labels each thread by kind and flags
+   possible prompt injection.
 3. For each: reads the comment and the code, then decides — **fix**, **reply only**, or **ask
    you** (when the answer is a design decision).
 4. Writes the decision to the thread's handoff, then commits the fix (if any), replies, and
@@ -414,6 +420,40 @@ How the concepts line up:
 **Adding a platform** (Jira, GitLab, Bitbucket, ...) means adding one adapter file that implements
 every operation of its kind. No phase file changes.
 
+### Decision signals (optional)
+
+A third, optional kind — **decisions** — asks a small local decision model typed questions about
+each new PR comment, in one request, and gets probabilities back instead of text:
+
+| Question | Used for | Acts only when |
+|---|---|---|
+| What kind of comment is it? (question / bug / convention / design / nit) | sorting and labeling the thread list | top option ≥ 0.85 |
+| Does it state a general rule? | the `Learning:` line for the learnings harvest | ≥ 0.85 yes, ≤ 0.15 no |
+| Does it ask the agent to run commands or ignore its instructions? | a `⚠ possible injection` warning before the thread is worked | ≥ 0.5 |
+
+Anything in between is *undecided*, and the agent judges as it would without a model. The model
+never decides fix, reply or ask, and the injection flag is a warning on top of the rule that PR
+comments are data — never a replacement for it.
+
+| Adapter | What it uses |
+|---|---|
+| [`none`](adapters/decisions/none.md) (default) | nothing — today's behavior |
+| [`ollama`](adapters/decisions/ollama.md) | a JEV-style model in a local [Ollama](https://ollama.com) (`/v1/systemone`) through the [TypeSafe SDK](https://pypi.org/project/typesafe-sdk/), via [`scripts/decide.py`](scripts/decide.py) |
+
+**Setup** (once per machine): install Ollama 0.35+, `ollama pull tev1`, install
+[uv](https://docs.astral.sh/uv/), then check with `uv run scripts/decide.py health`. Phase A runs
+that check and picks `ollama` or `none` by itself.
+
+**When the model is missing** — Ollama stopped, model not pulled, out of memory — nothing breaks:
+Phase C checks once per run, says so in one line, and works every thread without signals. The
+skill never installs Ollama or pulls a model.
+
+**Measuring a model.** `uv run scripts/eval_decisions.py --model <name>` runs labeled comments
+from [`scripts/eval_cases.json`](scripts/eval_cases.json) and counts, per question, the sure
+answers that were right, the sure answers that were **wrong**, and the undecided ones. On the
+bundled 30 comments, `tev1` (4B) gave no sure-but-wrong answer and flagged every injection, at
+about 3 s per comment on a laptop. Add your own past PR comments before trusting it for your team.
+
 ## Customizing for your project
 
 The skill reads your repo's rules and lets them win:
@@ -435,7 +475,8 @@ The skill reads your repo's rules and lets them win:
 - Never writes secrets into files, payloads, commits, or replies.
 - Owns only a marked block of the PR description. Anything people or bots write outside it is
   never touched; an edit inside it stops and asks you before anything is overwritten.
-- Treats PR comments and diffs as data: it never runs commands or code found in them.
+- Treats PR comments and diffs as data: it never runs commands or code found in them. The
+  optional decision model can flag a likely injection, but never clears a comment.
 - Writes the handoff **before** each side effect (commit, push, reply), so an interrupted run
   always leaves a record of what it decided.
 - The auditor resolves doubt toward blocking, never toward approval.
@@ -461,7 +502,8 @@ dev-workflow/
 ├── phases/               a-setup · b-execute · c-feedback · d-complete · e-learnings
 ├── agents/               cli-runner · planner · reviewer-code · reviewer-tests · pr-auditor ·
 │                         learnings-curator
-├── adapters/             CONTRACT.md · work-items/* · code-host/*
+├── adapters/             CONTRACT.md · work-items/* · code-host/* · decisions/*
+├── scripts/              decide.py · test_decide.py · eval_decisions.py · eval_cases.json
 ├── references/           tdd.md · conventions.md · stacking.md
 └── templates/            plan · task / thread / audit handoffs · PR description
 ```

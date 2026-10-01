@@ -3,7 +3,8 @@
 <!-- Built up during Phase A, written to disk before each side effect. Once Setup is
      `complete`, it is frozen: only the Changes log is appended. Every value a later phase or
      a later day needs is here. A replan (Phase B) may also update Tasks and Tickets; in stacked
-     mode the Stack table is also kept current. -->
+     mode the Stack table is also kept current. The user may switch the decisions adapter
+     (adapters/decisions/none.md) on the Adapters line. -->
 
 - Setup: in progress | complete
 - PR mode: single | stacked  <!-- stacked: see references/stacking.md -->
@@ -16,7 +17,7 @@
   <!-- stacked: two lines — stack=`.../worktrees/stack`, notes=`.../worktrees/notes` -->
 - Force-push: layer branches with `--force-with-lease`, approved by <user> on <yyyy-mm-dd>
   <!-- stacked only -->
-- Adapters: work-items=`<name>`, code-host=`<name>`
+- Adapters: work-items=`<name>`, code-host=`<name>`, decisions=`none` | `ollama (model <name>)`
 - Context: org=`<org>`, project=`<project>`, repo=`<repo>`, team=`<team or ->`
 - Conventions: parent_type=`<type>`, task_type=`<type>`, area=`<area>`, iteration=`<iteration>`,
   assignee=`<display name, login or @me>`
@@ -60,5 +61,6 @@
 
 ## Changes
 
-<!-- Appended when a replan changes the tickets. One line each. -->
+<!-- Appended when a replan changes the tickets, or the user switches the decisions adapter.
+     One line each. -->
 - <yyyy-mm-dd> — <what changed and why>

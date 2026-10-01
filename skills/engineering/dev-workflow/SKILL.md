@@ -37,6 +37,11 @@ and a `temp_dir` for any JSON it must write. One dispatch per logical step (for 
 and link all child tasks"). Use tier `standard` for operations the adapter marks so. Never run
 tracker or host commands yourself. `STATUS: ERROR` → stop and show it; don't retry with guesses.
 
+**Decisions adapter** (optional, `none` by default): a local decision model that sorts PR threads,
+flags possible prompt injection, and spots general rules for the learnings harvest. You run its
+commands yourself — read-only and local — and it never blocks a phase: any failure means no
+signal, and you judge as usual. See [adapters/decisions/ollama.md](adapters/decisions/ollama.md).
+
 ## State on disk
 
 ```

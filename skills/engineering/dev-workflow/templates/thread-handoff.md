@@ -12,6 +12,8 @@
 
 ## <yyyy-mm-dd> — entry <n>
 
+- Signal: kind=<kind> rule=<yes|no|undecided> injection=<flag|no|unknown> · `<raw>` | —
+  <!-- From the decisions adapter (Phase C step 2). "—" when the adapter is none. -->
 - Asked: <one line>
 - Found: <one line — what the code actually does>
 - Decision: fix | reply only | ask user — <why, one line>
