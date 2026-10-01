@@ -121,14 +121,60 @@ questions per request, thresholds as in the example spec (sure at 0.85 / 0.15, i
 at 0.5). Local: laptop with an RTX 3050 6 GB GPU and 32 GB RAM, Ollama 0.35.0, model warmed up
 first. Cloud: `https://api.typesafe.ai`.
 
-| Model | Where | Injection flag<br>✓ right · ✗ wrong · ? undecided | Missed injections | Comment kind<br>✓ right · ✗ wrong · ? undecided | General rule<br>✓ right · ✗ wrong · ? undecided | Time per request | Longest text | Verdict |
-|---|---|---|---|---|---|---|---|---|
-| `jev-latest` | cloud | ✓ 30 · ✗ **0** · ? 0 | **0 of 5** | ✓ 21 · ✗ **1** · ? 8 | ✓ 12 · ✗ **0** · ? 18 | **~0.3 s** | 60,000 chars | **Best overall** — fastest, answers most often, long text |
-| `jev-preview` | cloud | ✓ 30 · ✗ **0** · ? 0 | **0 of 5** | ✓ 21 · ✗ **1** · ? 8 | ✓ 12 · ✗ **0** · ? 18 | **~0.3 s** | — | Same as `jev-latest` on this set |
-| `tev1` (4B, 4.5 GB) | local | ✓ 30 · ✗ **0** · ? 0 | **0 of 5** | ✓ 18 · ✗ **0** · ? 12 | ✓ 10 · ✗ **0** · ? 20 | ~3.0–3.6 s | ~9,000 chars | **Best local** — free, private, offline; short inputs only |
-| `tev1:0.8b` (0.8 GB) | local | ✓ 18 · ✗ **12** · ? 0 | **1 of 5** | ✓ 6 · ✗ **0** · ? 24 | ✓ 7 · ✗ **10** · ? 13 | ~2.5 s | — | **Don't use** — 11 false alarms, 1 missed injection, 10 wrong rule answers |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Model</th>
+      <th rowspan="2">Where</th>
+      <th colspan="3">Injection flag</th>
+      <th rowspan="2">Missed<br>injections</th>
+      <th colspan="3">Comment kind</th>
+      <th colspan="3">General rule</th>
+      <th rowspan="2">Time per<br>request</th>
+      <th rowspan="2">Longest<br>text</th>
+      <th rowspan="2">Verdict</th>
+    </tr>
+    <tr>
+      <th>✓</th><th>✗</th><th>?</th><th>✓</th><th>✗</th><th>?</th><th>✓</th><th>✗</th><th>?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>jev-latest</code></td><td>cloud</td>
+      <td align="center">30</td><td align="center"><b>0</b></td><td align="center">0</td>
+      <td align="center"><b>0 of 5</b></td>
+      <td align="center">21</td><td align="center"><b>1</b></td><td align="center">8</td>
+      <td align="center">12</td><td align="center"><b>0</b></td><td align="center">18</td>
+      <td><b>~0.3 s</b></td><td>60,000 chars</td><td><b>Best overall</b> — fastest, answers most often, long text</td>
+    </tr>
+    <tr>
+      <td><code>jev-preview</code></td><td>cloud</td>
+      <td align="center">30</td><td align="center"><b>0</b></td><td align="center">0</td>
+      <td align="center"><b>0 of 5</b></td>
+      <td align="center">21</td><td align="center"><b>1</b></td><td align="center">8</td>
+      <td align="center">12</td><td align="center"><b>0</b></td><td align="center">18</td>
+      <td><b>~0.3 s</b></td><td>—</td><td>Same as <code>jev-latest</code> on this set</td>
+    </tr>
+    <tr>
+      <td><code>tev1</code><br>4B, 4.5 GB</td><td>local</td>
+      <td align="center">30</td><td align="center"><b>0</b></td><td align="center">0</td>
+      <td align="center"><b>0 of 5</b></td>
+      <td align="center">18</td><td align="center"><b>0</b></td><td align="center">12</td>
+      <td align="center">10</td><td align="center"><b>0</b></td><td align="center">20</td>
+      <td>~3.0–3.6 s</td><td>~9,000 chars</td><td><b>Best local</b> — free, private, offline; short inputs only</td>
+    </tr>
+    <tr>
+      <td><code>tev1:0.8b</code><br>0.8 GB</td><td>local</td>
+      <td align="center">18</td><td align="center"><b>12</b></td><td align="center">0</td>
+      <td align="center"><b>1 of 5</b></td>
+      <td align="center">6</td><td align="center"><b>0</b></td><td align="center">24</td>
+      <td align="center">7</td><td align="center"><b>10</b></td><td align="center">13</td>
+      <td>~2.5 s</td><td>—</td><td><b>Don't use</b> — 11 false alarms, 1 missed injection, 10 wrong rule answers</td>
+    </tr>
+  </tbody>
+</table>
 
-How to read it, for each of the 30 comments and each question:
+How to read it — each question has three sub-columns, counted over the 30 comments:
 
 - **✓ right** — the model was sure, and correct.
 - **✗ wrong** — the model was sure, and incorrect. **This is the number that matters**: the
