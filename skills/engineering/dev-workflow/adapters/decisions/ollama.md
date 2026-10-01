@@ -27,9 +27,8 @@ Environment variables, all optional, the same ones the TypeSafe SDK reads:
 `tev1`), `TYPESAFE_API_KEY` (default `ollama`; Ollama ignores it).
 
 **Choosing a model.** Models tried on a 30-comment set: `tev1` — no sure-but-wrong answer, every
-injection flagged, about 3 s per comment. `tev1:0.8b` — close to random, don't use. `nimble`
-(9B) — needs about 10 GB of free RAM or VRAM. Run `eval_decisions.py` before switching; record
-the model in `plan.md`.
+injection flagged, about 3 s per comment. `tev1:0.8b` — close to random, don't use. Run
+`eval_decisions.py` before switching; record the model in `plan.md`.
 
 ## Rules for every operation
 
