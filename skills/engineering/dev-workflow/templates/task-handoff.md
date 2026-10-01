@@ -7,9 +7,21 @@
 - Item: [<task-id>](<url>) · Plan: [plan.md](../plan.md)
 - Updated: <yyyy-mm-dd hh:mm>
 
+## Context
+
+<Copied from the ticket's Context in plan.md: why, where, patterns, constraints, out of scope.
+What you learn while building goes under "Gotchas and conventions found", not here.>
+
 ## Acceptance criteria
 
 - [ ] <criterion>
+
+## Definition of done
+
+<!-- Copied from the ticket. Tick a line only with evidence (test name, command output, review
+     round). Status `Done` needs every line ticked, or a gap the user accepted, recorded here. -->
+
+- [ ] <statement> — <evidence>
 
 ## Seams (confirmed)
 

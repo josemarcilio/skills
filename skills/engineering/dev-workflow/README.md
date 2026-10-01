@@ -41,7 +41,8 @@ the session, come back tomorrow, say "continue the work", and it picks up where 
 
 - **Plans into independent tasks.** A planner agent splits your plan into tickets that follow
   INVEST (Independent, Negotiable, Valuable, Estimable, Small, Testable). Each ticket is a vertical
-  slice with acceptance criteria and proposed test seams. You approve the split before anything is
+  slice with enough context to start cold (why, where, patterns to mirror, constraints, out of
+  scope), acceptance criteria, proposed test seams, and a definition of done. You approve the split before anything is
   created.
 - **Sets up the tracker and the branch.** It creates the parent item (PBI, story, or issue) and one
   child task per ticket, creates a worktree and a branch that follows your repo's naming rules, and

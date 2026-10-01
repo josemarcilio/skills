@@ -73,6 +73,21 @@ notes worktree/.agents/dev-workflows/<item-id>/
   branch.
 - Needs git 2.38 or newer (`rebase --update-refs`). Older → stop and tell the user.
 
+## Layer PR titles
+
+Every layer PR title shows the parent item's type, the layer, and the task title, so a PR list
+shows the stack order at a glance.
+
+- Default, when the project has no PR title pattern:
+  `<work-item-type> <item-id>: L<n> — <task title>`, for example
+  `Story 1234: L2 — Add retry policy to payment client`. `<work-item-type>` is the parent item's
+  `type` from `get_item` (or the type it was created with), as the tracker spells it.
+- The project has a pattern → use it, and put `L<n> — ` right before the task title. If the
+  pattern already holds the item type, don't add it twice.
+- Use `L<n>`, never `<n>/<total>`: layer numbers never change (new layers go on top, built layers
+  are never reordered), so titles never need renaming.
+- Record the resolved pattern in `plan.md` (`PR:` line).
+
 ## Operations
 
 Git commands run in the stack worktree, by the orchestrator — rebases can need judgment. PR work
@@ -87,8 +102,8 @@ then `git switch -c <branch-n>`. Record branch and base in the Stack table first
 
 After the layer's first push (a PR needs at least one commit): cli-runner `create_draft_pr` with
 `source_branch` = the layer branch, `target_branch` = the layer below (the target branch for the
-bottom open layer), `item_ids` = the parent item **and** this layer's task. Title: the project's
-pattern with the task title. Then `link_stack` with every open layer's PR, bottom first —
+bottom open layer), `item_ids` = the parent item **and** this layer's task. Title: see Layer PR
+titles below. Then `link_stack` with every open layer's PR, bottom first —
 `status: unsupported` is fine. Then update the Stack section of the other open layers'
 descriptions (see Descriptions).
 

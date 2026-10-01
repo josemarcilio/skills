@@ -16,8 +16,8 @@ done**, so reviewers start on the lower layers while the upper ones are built. E
 
 1. **Start.** cli-runner: `set_item_state` → `active` (task `state_map` from `plan.md`). Create
    `handoffs/<task-id>.md` from [templates/task-handoff.md](../templates/task-handoff.md), copying
-   acceptance criteria and candidate seams from the task's Tickets block in `plan.md` — or open the
-   existing one and resume from its **Next step** and seam statuses. Status `In progress`.
+   context, acceptance criteria, candidate seams and definition of done from the task's Tickets
+   block in `plan.md` — or open the existing one and resume from its **Next step** and seam statuses. Status `In progress`.
    **Stacked:** switch the stack worktree to the task's layer branch, creating it first if it
    doesn't exist yet (stacking.md → Start a layer). The layer below must be `Done` first.
 
@@ -34,7 +34,9 @@ done**, so reviewers start on the lower layers while the upper ones are built. E
    reviewer `PASS` means "no issues found by reading", not "it works". Failing checks: fix, re-run;
    re-review only if the fix changed production logic.
 
-5. **Close.** Write the handoff first (status `Done`, commits, gotchas, next step for the story),
+5. **Close.** Check the definition of done: tick each line in the handoff with its evidence. A
+   line you can't tick → finish it, or ask the user to accept the gap and record it. Then write
+   the handoff (status `Done`, commits, gotchas, next step for the story),
    then commit (task-scoped, per [conventions.md](../references/conventions.md)) and push.
    cli-runner: `set_item_state` → `done`. Tick the task in the PR description's managed block
    ([conventions.md](../references/conventions.md) → PR description → Update).

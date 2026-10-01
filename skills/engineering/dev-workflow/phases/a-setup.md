@@ -50,6 +50,8 @@ created (step 3 always reports its id) before creating one.
    or ask the user for any recent item id in the same project) and `current_iteration`. Discover
    branch pattern, target branch, PR title pattern, merge strategy, test and lint commands per
    [conventions.md](../references/conventions.md).
+   **Stacked:** resolve the layer PR title pattern per
+   [stacking.md](../references/stacking.md) → Layer PR titles.
 
 3. **Parent item.**
    - **Already exists** (the user gave an id): don't create or edit it. cli-runner: `get_item` for
@@ -73,16 +75,19 @@ created (step 3 always reports its id) before creating one.
 
 5. **Tickets.** Spawn `planner` (tier `capable`, `mode: initial`) with the plan and repo root.
    Relay its questions to the user and its follow-ups back, until the user approves and the
-   planner returns `status: final`. Write the Tasks table (ids `pending`) and one Tickets block
-   per ticket into `plan.md`.
+   planner returns `status: final`. A ticket with open questions, an empty `where`, or no
+   definition of done is not final — send it back to the planner. Write the Tasks table (ids
+   `pending`) and one Tickets block per ticket into `plan.md`.
    **Stacked:** pass `pr_mode: stacked`. Write the Tasks table in `stack_order`, the stack note
    into Decisions, and the Stack table (one row per task, branch names per
    [stacking.md](../references/stacking.md), PR `—`, state `building`; only `L1`'s base is set).
    Then create the stack worktree at `.agents/dev-workflows/<item-id>/worktrees/stack` on the `L1`
    branch from the target branch, and verify its name.
 
-6. **Child tasks.** Per ticket write one description file: "what to build" plus an "Acceptance
-   criteria" list. Dispatch **one** cli-runner step: `create_child_item` for every ticket still
+6. **Child tasks.** Per ticket write one description file with four sections, in this order:
+   "What to build", "Context" (why, where, patterns, constraints, out of scope), "Acceptance
+   criteria" and "Definition of done". The tracker item must make sense to someone who never
+   opens `plan.md`. Dispatch **one** cli-runner step: `create_child_item` for every ticket still
    `pending`, in order. Check each `linked: yes`; re-dispatch only failures. Fill the ids in the
    Tasks table.
 

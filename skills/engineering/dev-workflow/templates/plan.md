@@ -10,7 +10,8 @@
 - PR mode: single | stacked  <!-- stacked: see references/stacking.md -->
 - Item: [<item-id>](<item-url>)
 - PR: [<pr-id>](<pr-url>) — title pattern `<pattern>`, merge strategy `<squash|merge>`
-  <!-- stacked: "one per layer, see Stack" instead of a link -->
+  <!-- stacked: "one per layer, see Stack" instead of a link; the pattern includes the type and
+       `L<n>` per references/stacking.md → Layer PR titles -->
 - Branch: `<branch>` → `<target-branch>` (remote `origin`)
   <!-- stacked: the notes branch; layer branches are in the Stack table -->
 - Worktree: `<user-home>/.../.agents/dev-workflows/<item-id>/worktrees/<slug>`
@@ -49,15 +50,24 @@
 
 ## Tickets
 
-<!-- The planner's final output, one block per ticket. Source of acceptance criteria and seams
-     for Phase B and the PR audit. -->
+<!-- The planner's final output, one block per ticket. Source of context, acceptance criteria,
+     seams and definition of done for Phase B and the PR audit. Each block stands alone: a fresh
+     agent can start the ticket from this block plus the header, Scope and Decisions. -->
 
 ### T1 — <title>
 
 - What to build: <one paragraph>
+- Context:
+  - Why: <the problem and how it serves the goal>
+  - Where: <file or module>, <file or module>
+  - Patterns: <existing code or project rule to mirror>
+  - Constraints: <binding decision or limit>
+  - Out of scope: <nearby work> (<owning ticket or none>)
 - Acceptance criteria:
   - <criterion>
 - Candidate seams: <seam>, <seam>
+- Definition of done:
+  - <checkable statement>
 
 ## Changes
 

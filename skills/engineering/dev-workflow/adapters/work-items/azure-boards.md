@@ -81,8 +81,8 @@ Fallback if the patch fails: report it; the caller appends the criteria to the d
 
 ## create_child_item
 
-Task types usually have no acceptance-criteria field, so the criteria arrive inside
-`description_file`.
+Task types usually have no acceptance-criteria field, so the context, criteria and definition of
+done all arrive inside `description_file`.
 ```
 az boards work-item create --type "{task_type}" --title "{title}" --area "{area_path}" --iteration "{iteration_path}" --assigned-to "{assignee}" --description "@{description_file}" --output json
 az boards work-item relation add --id {new_id} --relation-type parent --target-id {parent_id} --output json
